@@ -91,7 +91,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-ROOT_URLCONF = 'carebase.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -109,7 +109,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'carebase.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
