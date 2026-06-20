@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -81,6 +82,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -127,6 +129,13 @@ if database_url:
             'PASSWORD': parsed_db.password or '',
             'HOST': parsed_db.hostname or '',
             'PORT': str(parsed_db.port or 5432),
+        }
+    }
+elif os.getenv('VERCEL') and not database_url:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': Path(tempfile.gettempdir()) / 'carebase.sqlite3',
         }
     }
 elif os.getenv('DB_ENGINE', 'postgres') == 'sqlite':
@@ -183,14 +192,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
-# The URL name of your login page
-LOGIN_URL = 'login' 
-
-# Where to send the user after they successfully log in
-LOGIN_REDIRECT_URL = 'home'
-
 # 1. Add the Authentication Backend
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -201,15 +202,20 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'account_login'
-# Ensure the Site ID matches what you have in the Admin
-SITE_ID = 1
-
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Add this line to tell Django to look in your root 'static' folder
 STATICFILES_DIRS = [

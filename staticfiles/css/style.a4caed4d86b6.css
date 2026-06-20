@@ -1,0 +1,520 @@
+/* Custom Variables - Expanded for CareBase Branding */
+:root {
+    --primary-navy: #1A365D;      /* Deep Professional Navy */
+    --accent-blue: #3182CE;       /* Trust Blue */
+    --accent-green: #A3E635;      /* Lime Green from VitaMédicale */
+    --header-blue: #0A2540;       /* Darker Navy for Top Bar */
+    --text-main: #2D3748;
+    --text-muted: #718096;
+    --bg-light: #F0F7FF;          /* Soft Blue-White for sections */
+    --white: #FFFFFF;
+    --transition: all 0.3s ease;
+}
+
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    line-height: 1.6;
+    background-color: var(--white);
+    overflow-x: hidden;
+}
+
+/* --- Header & Navigation --- */
+
+/* Top Utility Bar (Blue Strip) */
+.top-bar {
+    background-color: var(--header-blue);
+    color: var(--white);
+    padding: 8px 0;
+    font-size: 0.85rem;
+}
+
+.top-bar .container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 30px;
+}
+
+/* Navbar */
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #E2E8F0;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary-navy);
+}
+
+.logo span { color: #4ade80; } /* Green accent for logo leaf feel */
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: #4ade80; /* Light green hover matching your reference */
+}
+
+/* --- Buttons --- */
+
+.btn-appointment-green {
+    background-color: var(--accent-green);
+    color: var(--white);
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(163, 230, 53, 0.3);
+}
+
+.btn-appointment-green:hover {
+    background-color: #8cc62d;
+    transform: translateY(-2px);
+}
+
+/* --- Sections & Layout --- */
+
+.container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.py-20 { padding: 80px 0; }
+
+.bg-light { background-color: var(--bg-light); }
+
+.grid { display: grid; gap: 30px; }
+
+/* About Page Specifics */
+.display-title {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+}
+
+.section-title {
+    font-size: 2.5rem;
+    color: var(--primary-navy);
+    margin: 15px 0;
+    font-weight: 700;
+}
+
+.rounded-image {
+    border-radius: 60px; /* High curvature from reference */
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+/* --- Footer --- */
+
+.main-footer {
+    background-color: var(--primary-navy);
+    color: var(--white);
+    padding: 60px 0 20px;
+    border-radius: 80px 80px 0 0; /* Top rounded edge like the reference */
+    margin-top: 40px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1.5fr;
+    gap: 50px;
+    margin-bottom: 40px;
+}
+
+.footer-brand .logo-white {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.footer-brand .logo-white span { color: var(--accent-green); }
+
+.footer-links ul { list-style: none; }
+.footer-links a { 
+    color: var(--white); 
+    text-decoration: none; 
+    display: block; 
+    margin-bottom: 12px; 
+    opacity: 0.8;
+}
+
+.footer-contact h4 { margin-bottom: 20px; }
+.footer-contact p { margin-bottom: 10px; opacity: 0.9; }
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+/* --- Responsive Helpers --- */
+@media (max-width: 768px) {
+    .md\:grid-cols-2 { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; text-align: center; }
+    .display-title { font-size: 2.5rem; }
+    .nav-links { display: none; } /* Add a mobile menu later if needed */
+}
+
+/* Appointment Banner Styling */
+.appointment-banner {
+    background-color: var(--primary-navy); /* Dark Navy Blue */
+    border-radius: 40px; /* High rounding from image */
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+.appointment-banner h2 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.appointment-banner p {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+/* The subtle heart icon in the corner of the banner */
+.banner-heart-icon {
+    position: absolute;
+    bottom: -20px;
+    left: 20px;
+    width: 150px;
+    opacity: 0.2; /* Makes it subtle like the image */
+}
+
+.heart-icon-opacity {
+    width: 100%;
+    filter: brightness(0) invert(1); /* Makes the icon white */
+}
+
+/* Ensure the button matches the lime green in the image */
+.appointment-banner .btn-green {
+    background-color: var(--accent-green);
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* --- HERO SECTION --- */
+.hero-section {
+    background: linear-gradient(135deg, #E0F2FE 0%, #DBEAFE 100%);
+    padding: 100px 0;
+    text-align: center;
+    border-radius: 0 0 60px 60px;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, #E0F2FE 0%, #DBEAFE 100%);
+    padding: 80px 0;
+    text-align: center;
+    border-radius: 0 0 60px 60px;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin-bottom: 15px;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+.hero-label {
+    color: var(--accent-green);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 32px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: var(--transition);
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--accent-green);
+    color: white;
+    box-shadow: 0 4px 15px rgba(163, 230, 53, 0.3);
+}
+
+.btn-primary:hover {
+    background-color: #8cc62d;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary-navy);
+    border: 2px solid var(--primary-navy);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-navy);
+    color: white;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--primary-navy);
+    border: 2px solid var(--primary-navy);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-navy);
+    color: white;
+}
+
+/* --- SECTION LABELS --- */
+.section-label {
+    font-size: 0.9rem;
+    text-transform: capitalize;
+}
+
+/* --- WHY CHOOSE SECTION --- */
+.why-choose-section {
+    background-color: white;
+}
+
+.clinic-benefits li {
+    position: relative;
+    padding-left: 0;
+    line-height: 1.8;
+}
+
+.clinic-benefits strong {
+    color: var(--primary-navy);
+}
+
+.why-choose-images {
+    position: relative;
+}
+
+/* --- SERVICES SECTION --- */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.service-card {
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.service-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-icon img {
+    width: 100%;
+    height: auto;
+}
+
+/* --- TESTIMONIALS SECTION --- */
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.testimonial-card {
+    transition: var(--transition);
+    position: relative;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.stars {
+    font-size: 1.2rem;
+    color: #FFA500;
+    margin-bottom: 15px;
+}
+
+.testimonial-author {
+    margin-top: 20px;
+}
+
+.testimonial-author h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.testimonial-author p {
+    margin: 5px 0 0 0;
+    color: var(--text-muted);
+}
+
+/* --- CTA PERSONALIZED SECTION --- */
+.cta-personalized-section {
+    padding: 80px 0;
+}
+
+.cta-box {
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.cta-box h2 {
+    position: relative;
+    z-index: 1;
+    font-size: 2.5rem;
+}
+
+.cta-icon {
+    position: relative;
+    z-index: 1;
+}
+
+/* --- INFO SECTION --- */
+.info-section {
+    background-color: var(--primary-navy);
+}
+
+.info-section a {
+    color: var(--accent-green);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.info-section a:hover {
+    color: #8cc62d;
+    text-decoration: underline;
+}
+
+.info-details {
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-box h2 {
+        font-size: 1.8rem;
+    }
+}
