@@ -1,0 +1,153 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | CareBase Clinic</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981; --primary-dark: #059669;
+      --primary-pale: rgba(16,185,129,0.10);
+      --primary-glow: rgba(16,185,129,0.30);
+      --heading-blue: #1e3a8a; --text-dim: #64748b;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    @keyframes fadeSlideUp { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);} }
+    @keyframes floatOrbs   { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-18px) scale(1.03);} }
+    @keyframes gradShift   { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+    @keyframes dotPulse    { 0%,100%{box-shadow:0 0 8px rgba(16,185,129,.3);transform:scale(1);} 50%{box-shadow:0 0 18px rgba(16,185,129,.5);transform:scale(1.15);} }
+    @keyframes iconBounce  { 0%{transform:translateY(0);} 30%{transform:translateY(-5px);} 60%{transform:translateY(2px);} 100%{transform:translateY(0);} }
+    body { font-family:'DM Sans',sans-serif; min-height:100vh; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; }
+    /* LEFT */
+    .left-panel {
+      background:linear-gradient(145deg,#1e3a8a 0%,#1d4ed8 50%,#0f172a 100%);
+      background-size:300% 300%; animation:gradShift 12s ease infinite;
+      display:flex; flex-direction:column; justify-content:center; padding:60px 56px;
+      position:relative; overflow:hidden;
+    }
+    .orb { position:absolute; border-radius:50%; background:rgba(255,255,255,.04); animation:floatOrbs 8s ease-in-out infinite; }
+    .orb-1{width:340px;height:340px;top:-80px;left:-80px;animation-delay:0s;}
+    .orb-2{width:220px;height:220px;bottom:60px;right:-60px;animation-delay:3s;}
+    .orb-3{width:130px;height:130px;bottom:200px;left:80px;animation-delay:5s;background:rgba(16,185,129,.08);}
+    .orb-4{width:80px;height:80px;top:180px;right:100px;animation-delay:1.5s;background:rgba(16,185,129,.12);}
+    .left-content{position:relative;z-index:2;}
+    .left-logo{display:flex;align-items:center;gap:12px;margin-bottom:56px;text-decoration:none;}
+    .left-logo-mark{width:46px;height:46px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px var(--primary-glow);transition:var(--transition);}
+    .left-logo:hover .left-logo-mark{transform:scale(1.08) rotate(5deg);}
+    .left-logo-mark svg{width:24px;height:24px;fill:white;}
+    .left-logo-text{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:white;}
+    .left-logo-text span{color:var(--primary);}
+    .left-eyebrow{display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:6px 16px;}
+    .left-eyebrow::before{content:'';width:7px;height:7px;background:var(--primary);border-radius:50%;animation:dotPulse 2s infinite;}
+    .left-eyebrow span{color:rgba(255,255,255,.85);font-size:12px;font-weight:600;letter-spacing:.5px;}
+    .left-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3vw,2.8rem);font-weight:700;color:white;line-height:1.15;margin-bottom:18px;}
+    .left-title em{color:var(--primary);font-style:normal;}
+    .left-sub{font-size:15px;color:rgba(255,255,255,.65);line-height:1.8;max-width:380px;margin-bottom:44px;}
+    .feature-list{list-style:none;display:flex;flex-direction:column;gap:14px;}
+    .feature-list li{display:flex;align-items:center;gap:12px;font-size:14px;color:rgba(255,255,255,.8);font-weight:500;cursor:default;transition:var(--transition);}
+    .feature-list li:hover{color:white;transform:translateX(4px);}
+    .ficon-sm{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);transition:var(--transition);}
+    .feature-list li:hover .ficon-sm{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);animation:iconBounce .5s ease;}
+    /* RIGHT */
+    .right-panel{background:#fff;display:flex;flex-direction:column;justify-content:center;padding:60px 56px;overflow-y:auto;animation:fadeSlideUp .7s cubic-bezier(.16,1,.3,1) both;}
+    .form-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--primary-pale);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:5px 14px;margin-bottom:16px;}
+    .form-eyebrow span{color:var(--primary-dark);font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+    .form-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--heading-blue);line-height:1.1;margin-bottom:10px;}
+    .form-sub{font-size:14.5px;color:var(--text-dim);line-height:1.7;margin-bottom:32px;}
+    .input-group{margin-bottom:18px;}
+    .input-group label{display:block;font-size:12px;font-weight:700;color:var(--heading-blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+    .input-wrap{position:relative;}
+    .input-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;fill:var(--text-dim);transition:var(--transition);pointer-events:none;}
+    .input-group input{width:100%;padding:13px 14px 13px 42px;border:1.5px solid #e2e8f0;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14.5px;color:#1e293b;background:#f8fafc;outline:none;transition:var(--transition);}
+    .input-group input:focus{border-color:var(--primary);background:white;box-shadow:0 0 0 3px var(--primary-pale);}
+    .input-wrap:focus-within svg{fill:var(--primary);}
+    .submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary) 0%,#06b6d4 50%,var(--primary-dark) 100%);background-size:200% 200%;animation:gradShift 5s ease infinite;color:white;border:none;border-radius:13px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:var(--transition);box-shadow:0 4px 16px var(--primary-glow);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
+    .submit-btn:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 8px 28px rgba(16,185,129,.45);}
+    .submit-btn:active{transform:scale(0.98);}
+    .divider{display:flex;align-items:center;gap:14px;margin:24px 0;}
+    .divider hr{flex:1;border:none;border-top:1.5px solid #e8edf3;}
+    .divider span{color:var(--text-dim);font-size:13px;font-weight:500;}
+    .google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:13px 20px;border:1.5px solid #e2e8f0;border-radius:13px;background:white;color:#1e293b;font-family:'DM Sans',sans-serif;font-size:14.5px;font-weight:600;text-decoration:none;transition:var(--transition);}
+    .google-btn:hover{border-color:var(--heading-blue);background:#f8fafc;box-shadow:0 4px 16px rgba(30,58,138,.12);transform:translateY(-2px);}
+    .google-icon{width:20px;height:20px;flex-shrink:0;}
+    .error-box{background:#fff5f5;border:1.5px solid #fed7d7;border-radius:11px;padding:12px 16px;margin-bottom:18px;color:#c53030;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;}
+    .next-notice{background:#fffbeb;border:1.5px solid #fef3c7;border-radius:11px;padding:12px 16px;margin-bottom:18px;color:#92400e;font-size:13.5px;}
+    .signup-row{margin-top:22px;text-align:center;font-size:14px;color:var(--text-dim);}
+    .signup-row a{color:var(--primary-dark);font-weight:700;text-decoration:none;transition:var(--transition);}
+    .signup-row a:hover{color:var(--primary);text-decoration:underline;}
+    .back-link{display:inline-flex;align-items:center;gap:6px;margin-top:18px;color:var(--text-dim);font-size:13px;text-decoration:none;transition:var(--transition);}
+    .back-link:hover{color:var(--heading-blue);transform:translateX(-3px);}
+    @media(max-width:860px){body{grid-template-columns:1fr;}.left-panel{display:none;}.right-panel{padding:48px 28px;}}
+  </style>
+</head>
+<body>
+  <div class="left-panel">
+    <div class="orb orb-1"></div><div class="orb orb-2"></div>
+    <div class="orb orb-3"></div><div class="orb orb-4"></div>
+    <div class="left-content">
+      <a href="/" class="left-logo">
+        <div class="left-logo-mark"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.4-1.4L12 14.2l7.6-7.6L21 8l-9 9z"/></svg></div>
+        <span class="left-logo-text">Care<span>Base</span></span>
+      </a>
+      <div class="left-eyebrow"><span>Private Medical Clinic · Faisalabad</span></div>
+      <h1 class="left-title">Healthcare at your<br><em>fingertips.</em></h1>
+      <p class="left-sub">Sign in to access your health records, book appointments, and receive AI-powered diagnostics — all in one place.</p>
+      <ul class="feature-list">
+        <li><div class="ficon-sm">🤖</div>AI-powered symptom diagnostics</li>
+        <li><div class="ficon-sm">📅</div>Seamless appointment scheduling</li>
+        <li><div class="ficon-sm">🔒</div>Your data, fully secure</li>
+        <li><div class="ficon-sm">💚</div>No membership fees, ever</li>
+      </ul>
+    </div>
+  </div>
+  <div class="right-panel">
+    <div class="form-eyebrow"><span>🔒 Secure Login</span></div>
+    <h2 class="form-title">Welcome back</h2>
+    <p class="form-sub">Sign in to your CareBase account to manage appointments and health records.</p>
+    {% if next %}<div class="next-notice">🗓 Please sign in to book your appointment.</div>{% endif %}
+    {% if form.errors %}<div class="error-box">⚠ Incorrect username or password. Please try again.</div>{% endif %}
+    <form method="POST" action="{% url 'account_login' %}">
+      {% csrf_token %}
+      <div class="input-group">
+        <label for="id_login">Email or Username</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          <input type="text" name="login" id="id_login" placeholder="Enter your email or username" required>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="id_password">Password</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          <input type="password" name="password" id="id_password" placeholder="Enter your password" required>
+        </div>
+      </div>
+      {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />{% endif %}
+      <button type="submit" class="submit-btn">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+        Sign In to CareBase
+      </button>
+    </form>
+    <div class="signup-row">Don't have an account? <a href="{% url 'account_signup' %}">Create one free →</a></div>
+    <div class="divider"><hr><span>Or continue with</span><hr></div>
+    <a href="{% provider_login_url 'google' next=next %}" class="google-btn">
+      <svg class="google-icon" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Sign in with Google
+    </a>
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      Back to CareBase
+    </a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,274 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+.profile-hero { padding: 70px 0 40px; border-bottom: 1px solid var(--card-border); }
+.profile-hero h1 { font-size: clamp(2rem,4vw,2.8rem); }
+.profile-wrap { padding: 50px 0 90px; }
+.profile-grid { display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+
+/* Left card */
+.profile-card {
+  background: white; border: 1px solid var(--card-border); border-radius: 20px;
+  overflow: hidden; box-shadow: var(--shadow-sm); position: sticky; top: 100px;
+}
+.profile-card-head {
+  background: linear-gradient(135deg, var(--heading-blue) 0%, #1d4ed8 100%);
+  padding: 30px 24px; text-align: center;
+}
+.profile-avatar {
+  width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 800; color: white;
+  box-shadow: 0 4px 16px rgba(16,185,129,.4);
+}
+.profile-card-head h3 { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.profile-card-head p  { color: rgba(255,255,255,.65); font-size: 13px; }
+.profile-role {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 10px;
+  background: rgba(16,185,129,.2); border: 1px solid rgba(16,185,129,.4);
+  border-radius: 20px; padding: 3px 12px; color: rgba(255,255,255,.9); font-size: 12px; font-weight: 600;
+}
+
+/* Stats row */
+.profile-stats { display: grid; grid-template-columns: repeat(3,1fr); border-top: 1px solid var(--card-border); }
+.ps-item { padding: 18px 12px; text-align: center; border-right: 1px solid var(--card-border); }
+.ps-item:last-child { border-right: none; }
+.ps-num  { font-size: 22px; font-weight: 800; color: var(--heading-blue); font-family: 'DM Sans', sans-serif; }
+.ps-lbl  { font-size: 11px; color: var(--text-dim); margin-top: 3px; font-weight: 600; text-transform: uppercase; }
+.ps-item.green .ps-num { color: var(--primary-dark); }
+.ps-item.amber .ps-num { color: #d97706; }
+
+/* Edit form */
+.profile-form-section {
+  background: white; border: 1px solid var(--card-border); border-radius: 20px;
+  overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 28px;
+}
+.pf-head { padding: 20px 26px; border-bottom: 1px solid var(--card-border); background: #f8fafc; display: flex; align-items: center; gap: 12px; }
+.pf-head-icon { width: 38px; height: 38px; background: var(--primary-pale); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.pf-head-icon svg { width: 18px; height: 18px; fill: var(--primary-dark); }
+.pf-head h3 { font-size: 16px; color: var(--heading-blue); font-family: 'DM Sans', sans-serif; font-weight: 700; }
+.pf-body { padding: 26px; }
+.pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pf-full { grid-column: 1 / -1; }
+.pf-field { display: flex; flex-direction: column; gap: 6px; }
+.pf-field label { font-size: 12px; font-weight: 700; color: var(--heading-blue); text-transform: uppercase; letter-spacing: .4px; }
+.pf-field input {
+  padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 11px; font-size: 14.5px; font-family: 'DM Sans', sans-serif;
+  color: var(--text-main); transition: var(--transition);
+}
+.pf-field input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 3px var(--primary-pale); }
+.pf-readonly { background: #f1f5f9 !important; color: var(--text-dim) !important; cursor: not-allowed; }
+.pf-save { margin-top: 20px; display: flex; justify-content: flex-end; }
+.btn-save { padding: 12px 32px; background: var(--primary); color: white; border: none; border-radius: 11px; font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+.btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,.3); }
+
+/* Success alert */
+.save-success { background: #d1fae5; border: 1px solid #6ee7b7; border-radius: 11px; padding: 13px 18px; margin-bottom: 20px; color: #065f46; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+.save-error   { background: #fee2e2; border: 1px solid #fca5a5; border-radius: 11px; padding: 13px 18px; margin-bottom: 20px; color: #991b1b; font-weight: 600; font-size: 14px; }
+
+/* Appointments table */
+.appt-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.appt-table th { padding: 13px 18px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--card-border); background: #fafcff; }
+.appt-table td { padding: 14px 18px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
+.appt-table tr:last-child td { border-bottom: none; }
+.appt-table tr:hover td { background: #f8fafc; }
+.status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+.st-pending     { background: #fef3c7; color: #92400e; }
+.st-accepted    { background: #d1fae5; color: #065f46; }
+.st-rejected    { background: #fee2e2; color: #991b1b; }
+.st-rescheduled { background: #e0f2fe; color: #075985; }
+.st-rejected { background: #fee2e2; color: #991b1b; }
+.ai-tag { background: var(--primary-pale); color: var(--primary-dark); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.no-appts-msg { text-align: center; padding: 40px; color: var(--text-dim); }
+.no-appts-msg svg { width: 40px; height: 40px; fill: #cbd5e1; display: block; margin: 0 auto 12px; }
+
+/* Notifications */
+.notif-banner {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe; border-radius: 14px; padding: 18px 22px;
+  margin-bottom: 22px;
+}
+.notif-header {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; color: var(--heading-blue); font-size: 15px; margin-bottom: 12px;
+}
+.notif-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; animation: pulseBadge 2s infinite; }
+@keyframes pulseBadge { 0%,100%{transform:scale(1);} 50%{transform:scale(1.2);} }
+.notif-item {
+  padding: 11px 14px; background: white; border-radius: 10px;
+  border-left: 3px solid; margin-bottom: 8px; font-size: 13.5px; color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: var(--transition);
+}
+.notif-item:hover { transform: translateX(3px); }
+.notif-item:last-child { margin-bottom: 0; }
+.notif-item.rescheduled { border-color: #f59e0b; }
+.notif-item.accepted    { border-color: #10b981; }
+.notif-item.rejected    { border-color: #e11d48; }
+.notif-item.cancelled   { border-color: #6366f1; }
+.notif-icon { font-size: 16px; margin-right: 8px; }
+.notif-time { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* Also add rescheduled badge */
+.st-rescheduled { background: #fef3c7; color: #92400e; }
+
+
+@media(max-width:900px) { .profile-grid { grid-template-columns: 1fr; } .profile-card { position: static; } .pf-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section class="profile-hero">
+  <div class="container">
+    <span class="section-tag">My Account</span>
+    <h1>Profile & History</h1>
+    <p style="color:var(--text-dim);margin-top:8px;">Manage your details and view all your appointments.</p>
+  </div>
+</section>
+
+<section class="profile-wrap">
+  <div class="container">
+    <div class="profile-grid">
+
+      <!-- LEFT: Avatar + Stats -->
+      <div>
+        <div class="profile-card">
+          <div class="profile-card-head">
+            <div class="profile-avatar">
+              {% if user.first_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+              {% else %}{{ user.email|first|upper }}{% endif %}
+            </div>
+            <h3>{% if patient %}{{ patient.name }}{% else %}{{ user.username }}{% endif %}</h3>
+            <p>{{ user.email }}</p>
+            <div class="profile-role">{% if user.is_staff %}⚙ Admin{% else %}🏥 Patient{% endif %}</div>
+          </div>
+          <div class="profile-stats">
+            <div class="ps-item">
+              <div class="ps-num">{{ stats.total }}</div>
+              <div class="ps-lbl">Total</div>
+            </div>
+            <div class="ps-item green">
+              <div class="ps-num">{{ stats.accepted }}</div>
+              <div class="ps-lbl">Accepted</div>
+            </div>
+            <div class="ps-item amber">
+              <div class="ps-num">{{ stats.pending }}</div>
+              <div class="ps-lbl">Pending</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Edit form + History -->
+      <div>
+
+
+        <!-- Notifications -->
+        {% if notifications %}
+        <div class="notif-banner reveal">
+          <div class="notif-header">
+            <span class="notif-dot"></span>
+            📬 You have {{ notifications|length }} new notification{{ notifications|length|pluralize }}
+          </div>
+          {% for notif in notifications %}
+          <div class="notif-item {{ notif.notif_type }}">
+            <span class="notif-icon">
+              {% if notif.notif_type == 'rescheduled' %}🔄
+              {% elif notif.notif_type == 'accepted' %}✅
+              {% elif notif.notif_type == 'rejected' %}❌
+              {% else %}🔔{% endif %}
+            </span>
+            {{ notif.message }}
+            <div class="notif-time">{{ notif.created_at|timesince }} ago</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Messages -->
+        {% if messages %}
+          {% for msg in messages %}
+            <div class="{% if 'success' in msg.tags %}save-success{% else %}save-error{% endif %}">
+              {% if 'success' in msg.tags %}✓{% else %}⚠{% endif %} {{ msg }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Edit Profile -->
+        <div class="profile-form-section">
+          <div class="pf-head">
+            <div class="pf-head-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+            <h3>Personal Information</h3>
+          </div>
+          <div class="pf-body">
+            <form method="POST">
+              {% csrf_token %}
+              <div class="pf-grid">
+                <div class="pf-field pf-full">
+                  <label>Email Address</label>
+                  <input type="email" value="{{ user.email }}" class="pf-readonly" readonly>
+                </div>
+                <div class="pf-field pf-full">
+                  <label>Full Name</label>
+                  <input type="text" name="name" value="{% if patient %}{{ patient.name }}{% endif %}" placeholder="Your full name" required>
+                </div>
+                <div class="pf-field">
+                  <label>Age</label>
+                  <input type="number" name="age" min="1" max="120" value="{% if patient %}{{ patient.age }}{% endif %}" placeholder="Your age" required>
+                </div>
+                <div class="pf-field">
+                  <label>Address</label>
+                  <input type="text" name="address" value="{% if patient %}{{ patient.address }}{% endif %}" placeholder="Your address" required>
+                </div>
+              </div>
+              <div class="pf-save">
+                <button type="submit" class="btn-save">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Appointment History -->
+        <div class="profile-form-section">
+          <div class="pf-head">
+            <div class="pf-head-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
+            <h3>Appointment History</h3>
+          </div>
+          <div style="overflow-x:auto;">
+            {% if appointments %}
+            <table class="appt-table">
+              <thead>
+                <tr>
+                  <th>Doctor</th><th>Date & Time</th><th>Symptoms</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appt in appointments %}
+                <tr>
+                  <td>
+                    <strong>{% if appt.doctor %}Dr. {{ appt.doctor.name }}{% else %}Unassigned{% endif %}</strong>
+                    {% if appt.doctor %}<br><span style="color:var(--text-dim);font-size:12px;">{{ appt.doctor.specialty }}</span>{% endif %}
+                    {% if appt.ai_assigned_doctor %}<br><span class="ai-tag">AI matched</span>{% endif %}
+                  </td>
+                  <td>{{ appt.date }}<br><span style="color:var(--text-dim);font-size:12px;">{{ appt.time_slot|time:"g:i A" }}</span></td>
+                  <td style="max-width:200px;"><span style="font-size:13px;">{{ appt.symptoms|truncatechars:60 }}</span></td>
+                  <td><span class="status-badge st-{{ appt.status }}">{{ appt.get_status_display }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <div class="no-appts-msg">
+              <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.89 3 3 3.9 3 5v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+              No appointments yet.
+              <br><a href="{% url 'book_appointment' %}" style="color:var(--primary);font-weight:600;text-decoration:none;">Book your first visit →</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

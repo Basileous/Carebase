@@ -1,0 +1,266 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+/* ── HERO ── */
+.hero { padding: 110px 0 100px; position: relative; overflow: hidden; min-height: 92vh; display: flex; align-items: center; }
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(16,185,129,0.05) 0%, transparent 50%),
+              radial-gradient(circle at 20% 80%, rgba(30,58,138,0.03) 0%, transparent 50%);
+}
+.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; position: relative; z-index: 1; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--primary-pale); color: var(--primary-dark);
+  padding: 6px 18px; border-radius: 30px; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 24px;
+}
+.hero h1 { font-size: clamp(2.6rem, 5vw, 4.2rem); margin-bottom: 22px; line-height: 1.1; }
+.hero h1 em, .hero h1 em .reveal-word { 
+  color: transparent !important; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text !important; background-clip: text !important; font-style: normal;
+}
+.hero h1 em .reveal-word-wrap { overflow: visible; }
+.hero-sub { font-size: 16.5px; color: var(--text-dim); margin-bottom: 40px; max-width: 480px; line-height: 1.85; }
+.hero-sub strong { color: var(--heading-blue); }
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.hero-collage { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 250px 210px; gap: 16px; animation: fadeUp 1s ease-out 0.2s both; }
+.hc-item { border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-md); border: 4px solid white; position: relative; }
+.hc-item img { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 0.6s ease; }
+.hc-item:hover img { transform: scale(1.05); }
+.hc-item.wide { grid-column: 1 / -1; grid-row: 1; }
+.hc-badge {
+  position: absolute; bottom: 16px; left: 16px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  color: var(--heading-blue); padding: 8px 16px; border-radius: 30px; font-size: 12.5px; font-weight: 700; box-shadow: var(--shadow-sm);
+}
+
+/* ── STATS STRIP ── */
+.stats-strip { background: white; padding: 40px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); position: relative; z-index: 2; box-shadow: var(--shadow-sm); }
+.stats-inner { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 28px; }
+.stat-item { text-align: center; }
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 3.2rem; font-weight: 700; color: var(--heading-blue); line-height: 1; margin-bottom: 6px; }
+.stat-label { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── WHY CHOOSE ── */
+.why-section { padding: 110px 0; }
+.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.why-text p { font-size: 16px; line-height: 1.9; margin-bottom: 16px; }
+.why-text p strong { color: var(--heading-blue); }
+.why-text .tagline {
+  color: var(--primary-dark); font-weight: 600; font-style: italic; font-size: 16px;
+  margin-top: 24px; border-left: 3px solid var(--primary); padding-left: 18px;
+  background: var(--primary-pale); padding: 16px 20px; border-radius: 0 12px 12px 0;
+}
+.why-images { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.why-img { border-radius: 24px; overflow: hidden; height: 280px; box-shadow: var(--shadow-md); border: 4px solid white; }
+.why-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.6s ease; }
+.why-img:hover img { transform: scale(1.05); }
+
+/* ── SERVICES (Overhauled Cards) ── */
+.services-section { padding: 110px 0; background: rgba(240, 247, 251, 0.5); border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); }
+.services-header { text-align: center; margin-bottom: 20px; }
+.services-btns { display: flex; gap: 14px; justify-content: center; margin-top: 32px; }
+.svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
+
+.svc-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  padding: 36px 30px; border-radius: 20px; transition: var(--transition);
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.svc-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+  background: var(--primary); opacity: 0; transition: var(--transition);
+}
+.svc-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: rgba(16, 185, 129, 0.2); }
+.svc-card:hover::after { opacity: 1; }
+
+.svc-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--primary-pale); display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px; transition: var(--transition); border: 1px solid rgba(16, 185, 129, 0.1);
+}
+.svc-card:hover .svc-icon { background: var(--primary); transform: scale(1.1); box-shadow: 0 4px 15px var(--primary-glow); }
+.svc-icon svg { width: 26px; height: 26px; fill: var(--primary-dark); transition: var(--transition); }
+.svc-card:hover .svc-icon svg { fill: white; }
+
+.svc-card h3 { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--heading-blue); margin-bottom: 12px; }
+.svc-card p { font-size: 14.5px; color: var(--text-dim); line-height: 1.7; }
+
+/* ── DOCTORS ── */
+.doctors-section { padding: 110px 0; }
+.docs-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-top: 50px; }
+.doc-card { border-radius: 20px; overflow: hidden; background: white; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+.doc-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--primary-pale); }
+.doc-photo { height: 220px; overflow: hidden; position: relative; }
+.doc-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.6s ease; }
+.doc-card:hover .doc-photo img { transform: scale(1.05); }
+.doc-info { padding: 18px 16px; text-align: center; }
+.doc-info strong { display: block; font-size: 16px; color: var(--heading-blue); font-weight: 700; margin-bottom: 4px; }
+.doc-info span { font-size: 13px; color: var(--primary-dark); font-weight: 600; }
+
+/* ── TESTIMONIALS ── */
+.testimonials-section { padding: 110px 0; background: var(--card-bg); border-top: 1px solid var(--card-border); }
+.testi-header { text-align: center; margin-bottom: 60px; }
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 24px; }
+.testi-card { background: #f8fafc; border: 1px solid var(--card-border); border-radius: 20px; padding: 32px; transition: var(--transition); }
+.testi-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); background: white; }
+.tc-stars { color: #F59E0B; font-size: 14px; letter-spacing: 2px; margin-bottom: 16px; }
+.tc-text { font-size: 15px; color: var(--text-main); line-height: 1.8; margin-bottom: 24px; font-style: italic; }
+.tc-author strong { display: block; font-size: 15px; color: var(--heading-blue); font-weight: 700; }
+.tc-author span { font-size: 13px; color: var(--text-dim); }
+
+/* ── CTA ── */
+.cta-section { padding: 90px 0; }
+.cta-box {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 32px; padding: 70px 50px; text-align: center; position: relative; overflow: hidden;
+  box-shadow: var(--shadow-lg); color: white;
+}
+.cta-box::before { content: ''; position: absolute; top: -100px; right: -50px; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+.cta-box h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 16px; position: relative; z-index: 1; color: white; }
+.cta-box p { font-size: 17px; color: rgba(255,255,255,0.9); margin-bottom: 36px; position: relative; z-index: 1; }
+.cta-icon { width: 64px; height: 64px; fill: white; margin-bottom: 20px; display: inline-block; animation: floatY 4s ease-in-out infinite; }
+
+@media (max-width: 960px) { .hero-inner, .why-grid { grid-template-columns: 1fr; } .svc-grid { grid-template-columns: 1fr 1fr; } .docs-row { grid-template-columns: 1fr 1fr; } .hero-collage { display: none; } }
+@media (max-width: 600px) { .svc-grid, .docs-row { grid-template-columns: 1fr; } }
+</style>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow reveal">Private Medical Clinic</div>
+        
+        <h1 class="reveal-text" data-split-speed="fast">Your private clinic with <em>AI-powered care</em> and zero fees.</h1>
+        
+        <p class="hero-sub reveal-text"><strong>AI-powered healthcare management</strong> for seamless appointments, diagnostics, and patient care in Faisalabad.</p>
+        
+        <div class="hero-btns reveal reveal-delay-2">
+          <a href="{% url 'book_appointment' %}" class="btn-primary">Make an appointment</a>
+          <a href="{% url 'about' %}" class="btn-glass">About us</a>
+        </div>
+      </div>
+      <div class="hero-collage">
+        <div class="hc-item wide"><img src="{% static 'img/doc4.jpg' %}" alt="Senior Doctor"><span class="hc-badge">🏥 Expert Care</span></div>
+        <div class="hc-item"><img src="{% static 'img/doc3.webp' %}" alt="Specialist"><span class="hc-badge">👩‍⚕️ Specialists</span></div>
+        <div class="hc-item"><img src="{% static 'img/doc2.webp' %}" alt="Telehealth"><span class="hc-badge">💻 Telehealth</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-strip">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item reveal"><div class="stat-num" data-target="2400" data-suffix="+">0</div><div class="stat-label">Appointments</div></div>
+      <div class="stat-item reveal reveal-delay-1"><div class="stat-num" data-target="18">0</div><div class="stat-label">Specialists</div></div>
+      <div class="stat-item reveal reveal-delay-2"><div class="stat-num" data-target="4.9" data-float="1" data-suffix="★">0</div><div class="stat-label">Satisfaction</div></div>
+      <div class="stat-item reveal reveal-delay-3"><div class="stat-num" style="color:var(--primary);" data-target="100" data-suffix="%">0</div><div class="stat-label">AI Diagnostics</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="why-section">
+  <div class="container">
+    <div class="why-grid">
+      <div class="why-text">
+        <span class="section-tag reveal">About us</span>
+        
+        <h2 class="section-title reveal-text">Why choose our clinic?</h2>
+        
+        <p class="reveal-text soft-fade" data-split-speed="fast"><strong>At CareBase, we are deeply committed to providing you with personalized, high-quality care, delivered by a close-knit team.</strong></p>
+        <p class="reveal"><strong>Reception Staff:</strong> From the moment you arrive, our receptionist welcomes you and guides you with care.</p>
+        <p class="reveal"><strong>Nursing Support:</strong> Our nurse supports you with compassion throughout your medical journey.</p>
+        <p class="reveal"><strong>Medical Care:</strong> The physician listens attentively and tailors treatments to your specific needs.</p>
+        <p class="tagline reveal">A relationship built on trust — that's what makes all the difference.</p>
+        <br>
+        <a href="{% url 'about' %}" class="btn-glass reveal">Learn more about us</a>
+      </div>
+      <div class="why-images reveal reveal-delay-1">
+        <div class="why-img"><img src="{% static 'img/doc1.webp' %}" alt="Doctor"></div>
+        <div class="why-img"><img src="{% static 'img/doc5.webp' %}" alt="Doctor"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services-section">
+  <div class="container">
+    <div class="services-header">
+      <span class="section-tag reveal">Our services</span>
+      <h2 class="section-title reveal-text" data-split-speed="slow">Take charge of your health today.</h2>
+      <p class="section-subtitle reveal" style="margin:0 auto;">Opting for private medical consultations ensures quick access, in-depth appointments and personalized care.</p>
+    </div>
+    
+    <div class="svc-grid">
+      <div class="svc-card reveal reveal-delay-1">
+        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+        <h3>Health check-up</h3><p>Comprehensive health screening and preventive care assessments tailored to your needs.</p>
+      </div>
+      <div class="svc-card reveal reveal-delay-2">
+        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+        <h3>General Consultation</h3><p>Same-day appointments for acute illnesses, chronic disease management, and more.</p>
+      </div>
+      <div class="svc-card reveal reveal-delay-3">
+        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg></div>
+        <h3>Telehealth Services</h3><p>Consult with our doctors remotely from the comfort of your home.</p>
+      </div>
+      <div class="svc-card reveal reveal-delay-1">
+        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg></div>
+        <h3>Business Services</h3><p>Workplace health checkups, pre-employment medicals, and wellness programs.</p>
+      </div>
+      <div class="svc-card reveal reveal-delay-2">
+        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M12 2c-4.97 0-9 4.03-9 9 0 4.17 2.84 7.67 6.69 8.69L12 22l2.31-2.31C18.16 18.67 21 15.17 21 11c0-4.97-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/></svg></div>
+        <h3>Mental Health</h3><p>Professional consultations for stress, anxiety, depression, and mental wellness.</p>
+      </div>
+      <div class="svc-card reveal reveal-delay-3">
+        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+        <h3>AI Diagnostics</h3><p>Our Transformer-based AI analyzes symptoms and matches you with the right specialist.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doctors-section">
+  <div class="container">
+    <span class="section-tag reveal">Our Team</span>
+    <h2 class="section-title reveal-text" data-split-speed="fast">Meet Our Specialists</h2>
+    <div class="docs-row">
+      <div class="doc-card reveal reveal-delay-1"><div class="doc-photo"><img src="{% static 'img/doc4.jpg' %}" alt="Dr. Ahmed Jan"></div><div class="doc-info"><strong>Dr. Ahmed Jan</strong><span>General Medicine</span></div></div>
+      <div class="doc-card reveal reveal-delay-2"><div class="doc-photo"><img src="{% static 'img/doc2.webp' %}" alt="Dr. Zoya Hassan"></div><div class="doc-info"><strong>Dr. Zoya Hassan</strong><span>Cardiology</span></div></div>
+      <div class="doc-card reveal reveal-delay-3"><div class="doc-photo"><img src="{% static 'img/doc3.webp' %}" alt="Dr. Sara Malik"></div><div class="doc-info"><strong>Dr. Sara Malik</strong><span>Pediatrics</span></div></div>
+      <div class="doc-card reveal reveal-delay-1"><div class="doc-photo"><img src="{% static 'img/doc5.webp' %}" alt="Dr. Bilal Raza"></div><div class="doc-info"><strong>Dr. Bilal Raza</strong><span>Neurology</span></div></div>
+      <div class="doc-card reveal reveal-delay-2"><div class="doc-photo"><img src="{% static 'img/doc1.webp' %}" alt="Dr. Omar Farooq"></div><div class="doc-info"><strong>Dr. Omar Farooq</strong><span>Dermatology</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials-section">
+  <div class="container">
+    <div class="testi-header">
+      <span class="section-tag reveal">Testimonials</span>
+      <h2 class="section-title reveal-text" data-split-speed="fast">Client experiences</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal reveal-delay-1"><div class="tc-stars">★★★★★</div><p class="tc-text">"Very good service... attentive and professional team... appointments respected."</p><div class="tc-author"><strong>Diane St-Germain</strong><span>Patient</span></div></div>
+      <div class="testi-card reveal reveal-delay-2"><div class="tc-stars">★★★★★</div><p class="tc-text">"I am really satisfied with the service. A friend referred me and I am very grateful!"</p><div class="tc-author"><strong>Ahmed Islam</strong><span>Patient</span></div></div>
+      <div class="testi-card reveal reveal-delay-3"><div class="tc-stars">★★★★★</div><p class="tc-text">"The AI diagnosis matched me with exactly the right specialist. Highly recommend."</p><div class="tc-author"><strong>Sara Amjad</strong><span>Patient</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box reveal">
+      <svg class="cta-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <h2>Innovative personalized care awaits you</h2>
+      <p>Book your appointment today — our AI will find the right specialist for you.</p>
+      <a href="{% url 'book_appointment' %}" style="background:white; color:var(--primary-dark); font-weight:700; padding:16px 36px; border-radius:50px; text-decoration:none; display:inline-block; transition:transform 0.3s; box-shadow:0 10px 20px rgba(0,0,0,0.1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Book an appointment</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

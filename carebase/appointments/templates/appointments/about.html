@@ -1,0 +1,146 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .about-hero { padding: 90px 0 60px; text-align: center; background: linear-gradient(135deg, var(--bg-start) 0%, #e0f2fe 100%); }
+  .vision-grid, .mission-inner { margin-top: 60px; }
+  .vision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .vision-img { position: relative; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-lg); border: 4px solid white; }
+  .vision-img img { width: 100%; height: auto; display: block; transition: transform 0.6s ease; }
+  .vision-img:hover img { transform: scale(1.05); }
+  
+  /* Upgraded Features Grid with SVGs */
+  .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+  .feature-box { background: white; padding: 40px; border-radius: 24px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+  .feature-box:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--primary-pale); }
+  .feature-box h3 { display: flex; align-items: center; gap: 12px; font-family: 'DM Sans', sans-serif; font-size: 20px; margin-bottom: 20px; }
+  .ficon { width: 50px; height: 50px; background: var(--primary-pale); border-radius: 14px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+  .ficon svg { width: 24px; height: 24px; fill: var(--primary-dark); }
+  .feature-box:hover .ficon { background: var(--primary); transform: scale(1.1) rotate(5deg); }
+  .feature-box:hover .ficon svg { fill: white; }
+  .feature-box ul { list-style: none; padding: 0; }
+  .feature-box li { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 15px; color: var(--text-dim); }
+  .feature-box li::before { content: ''; width: 6px; height: 6px; background: var(--primary); border-radius: 50%; }
+
+  /* Synced Doctor Cards */
+  .specialists-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 40px; }
+  .specialist-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); transition: var(--transition); text-align: center; }
+  .specialist-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); border-color: var(--primary-pale); }
+  .specialist-photo { height: 240px; overflow: hidden; }
+  .specialist-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.6s ease; }
+  .specialist-card:hover .specialist-photo img { transform: scale(1.05); }
+  .specialist-info { padding: 20px; }
+  .specialist-info h3 { font-size: 18px; margin-bottom: 4px; }
+  .specialist-specialty { font-size: 14px; color: var(--primary-dark); font-weight: 700; margin-bottom: 14px; }
+  .specialist-book { display: inline-block; padding: 10px 20px; border-radius: 50px; background: var(--primary-pale); color: var(--primary-dark); font-weight: 700; font-size: 13px; text-decoration: none; transition: var(--transition); }
+  .specialist-book:hover { background: var(--primary); color: white; transform: scale(1.05); }
+
+  /* Dev Grid */
+  .dev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 80px; }
+  .dev-card { background: white; border: 1px solid var(--card-border); border-radius: 20px; padding: 30px; text-align: center; box-shadow: var(--shadow-sm); transition: var(--transition); }
+  .dev-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+  .dev-avatar { width: 70px; height: 70px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .dev-name { font-size: 18px; font-weight: 700; color: var(--heading-blue); }
+  .dev-role { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+  .dev-reg { font-size: 12px; background: #f1f5f9; display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 600; color: var(--heading-blue); }
+
+  .stack-tags { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 30px; }
+  .stack-tag { background: white; border: 1px solid var(--card-border); padding: 12px 24px; border-radius: 50px; font-weight: 600; color: var(--heading-blue); box-shadow: var(--shadow-sm); transition: var(--transition); }
+  .stack-tag:hover { transform: translateY(-3px); border-color: var(--primary); color: var(--primary-dark); }
+</style>
+
+<section class="about-hero">
+  <div class="container">
+    <span class="section-tag reveal">About us</span>
+    <h1 class="reveal reveal-delay-1" style="font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 20px;">Redefining private<br>healthcare with innovation.</h1>
+    <p class="reveal reveal-delay-2" style="font-size:17px; color:var(--text-dim); max-width:600px; margin: 0 auto;">Dedicated to providing personalized, high-quality care in the heart of Faisalabad.</p>
+  </div>
+</section>
+
+<section class="vision-section" style="padding: 60px 0;">
+  <div class="container">
+    <div class="vision-grid">
+      <div class="vision-text reveal">
+        <span class="section-tag">Our vision</span>
+        <h2 class="section-title">Connected through people, guided by health.</h2>
+        <p style="font-size: 16px; color: var(--text-dim); margin-bottom: 16px;">At <strong>CareBase</strong>, we take great pride in offering you personalized care thanks to a dedicated and cohesive team. From the moment you arrive at our facility in <strong>Regency Plaza</strong>, our reception staff warmly welcomes you.</p>
+        <p style="font-size: 16px; color: var(--text-dim); margin-bottom: 24px;">Our nurses and doctors listen carefully to offer treatments tailored to your specific needs, powered by modern AI diagnostics.</p>
+        <a href="{% url 'contact' %}" class="btn-primary">Contact our clinic</a>
+      </div>
+      <div class="vision-img reveal reveal-delay-2">
+        <img src="{% static 'img/doc1.webp' %}" alt="CareBase Doctor">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features-section" style="padding: 60px 0; background: #f8fafc; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border);">
+  <div class="container">
+    <div style="text-align: center;">
+      <span class="section-tag reveal">What we offer</span>
+      <h2 class="section-title reveal-text">Professional Care & Access</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-box reveal">
+        <h3>
+          <div class="ficon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+          </div>
+          Professional Care
+        </h3>
+        <ul>
+          <li>Expert team of doctors and specialists</li>
+          <li>Personalized treatment plans</li>
+          <li>Modern medical facilities</li>
+          <li>AI-powered diagnostics</li>
+        </ul>
+      </div>
+      <div class="feature-box reveal reveal-delay-1">
+        <h3>
+          <div class="ficon">
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          </div>
+          Accessible Healthcare
+        </h3>
+        <ul>
+          <li>No membership fees required</li>
+          <li>Flexible appointment scheduling</li>
+          <li>Affordable, transparent pricing</li>
+          <li>Google login — no new passwords</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="team-section" style="padding: 80px 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 50px;">
+      <span class="section-tag reveal">Our Specialists</span>
+      <h2 class="section-title reveal-text">Meet Our Doctors</h2>
+    </div>
+
+    <div class="specialists-grid">
+      <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc4.jpg' %}" alt="Dr. Ahmed Jan"></div><div class="specialist-info"><h3>Dr. Ahmed Jan</h3><div class="specialist-specialty">General Medicine</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
+      <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc2.webp' %}" alt="Dr. Zoya Hassan"></div><div class="specialist-info"><h3>Dr. Zoya Hassan</h3><div class="specialist-specialty">Cardiology</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
+      <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc3.webp' %}" alt="Dr. Sara Malik"></div><div class="specialist-info"><h3>Dr. Sara Malik</h3><div class="specialist-specialty">Pediatrics</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
+      <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc5.webp' %}" alt="Dr. Bilal Raza"></div><div class="specialist-info"><h3>Dr. Bilal Raza</h3><div class="specialist-specialty">Neurology</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
+      <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc1.webp' %}" alt="Dr. Omar Farooq"></div><div class="specialist-info"><h3>Dr. Omar Farooq</h3><div class="specialist-specialty">Dermatology</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid var(--card-border); margin: 80px 0;">
+
+    <div style="text-align: center; margin-bottom: 50px;">
+      <h2 class="section-title reveal-text">Meet the Developers</h2>
+      <p style="color:var(--text-dim); font-size:15px;">IKES&T Semester Project — Software Engineering</p>
+    </div>
+    
+    <div class="dev-grid">
+      <div class="dev-card reveal"><div class="dev-avatar" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">MH</div><div class="dev-name">Muhammad Hamdoon</div><div class="dev-role">Software Engineer</div><div class="dev-reg">Reg# 2024387</div></div>
+      <div class="dev-card reveal reveal-delay-1"><div class="dev-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">AI</div><div class="dev-name">Abeer Ihsan</div><div class="dev-role">Software Engineer</div><div class="dev-reg">Reg# 2024053</div></div>
+      <div class="dev-card reveal reveal-delay-2"><div class="dev-avatar" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">BJ</div><div class="dev-name">Basil Joseph</div><div class="dev-role">Software Engineer</div><div class="dev-reg">Reg# 2024138</div></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

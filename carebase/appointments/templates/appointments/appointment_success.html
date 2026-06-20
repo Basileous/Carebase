@@ -1,0 +1,70 @@
+{% extends 'appointments/base.html' %}
+{% block content %}
+<style>
+.success-wrap { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 80px 0; }
+.success-card {
+  background: white; border: 1px solid var(--card-border); border-radius: 24px; padding: 50px 40px;
+  max-width: 600px; width: 100%; text-align: center; box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.6s ease-out both; position: relative; overflow: hidden;
+}
+.success-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--primary), #06b6d4, var(--primary-dark)); background-size:200% 200%; animation:btnGradShift 4s ease infinite; }
+.success-icon {
+  width: 80px; height: 80px; margin: 0 auto 24px;
+  background: linear-gradient(135deg, var(--primary-pale), rgba(6,182,212,0.15));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 30px var(--primary-glow); animation: dotPulse 3s infinite;
+}
+.success-icon svg { width: 40px; height: 40px; fill: var(--primary-dark); }
+.success-card h2 { font-size: 2rem; color: var(--heading-blue); margin-bottom: 10px; }
+.success-card > p { color: var(--text-dim); font-size: 16px; margin-bottom: 30px; }
+
+.detail-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; text-align: left; margin-bottom: 24px; }
+.detail-card h4 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--heading-blue); border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px; display:flex; align-items:center; gap:8px;}
+.detail-card h4 svg { width:18px; height:18px; fill:var(--primary); }
+.detail-row { margin-bottom: 12px; }
+.detail-row strong { display: block; font-size: 12.5px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+.detail-row span { font-size: 15px; color: var(--text-main); font-weight: 500; }
+.detail-row.diagnosis span { color: var(--primary-dark); font-weight: 700; }
+
+.ai-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-pale); color: var(--primary-dark); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-top: 10px; }
+.ai-badge svg { width:16px; height:16px; fill:currentColor; }
+.success-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+/* Success page extra */
+.detail-card { transition: box-shadow 0.3s ease; }
+.detail-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.ai-badge { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.ai-badge:hover { transform: scale(1.04); box-shadow: 0 4px 14px rgba(16,185,129,0.2); }
+
+</style>
+
+<div class="success-wrap">
+  <div class="container" style="display:flex; justify-content:center;">
+    <div class="success-card">
+      <div class="success-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+      <h2>Appointment Confirmed!</h2>
+      <p>Your appointment has been successfully booked.</p>
+
+      <div class="detail-card">
+        <h4><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> AI Health Analysis</h4>
+        <div class="detail-row diagnosis"><strong>Predicted Diagnosis</strong><span>{{ appointment.ai_predicted_disease }}</span></div>
+        <div class="detail-row"><strong>Precautions</strong><span><em>{{ appointment.ai_precaution }}</em></span></div>
+      </div>
+
+      <div class="detail-card">
+        <h4><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg> Appointment Details</h4>
+        <div class="detail-row"><strong>Specialist</strong><span>{{ appointment.doctor.name }} — {{ appointment.doctor.specialty }}</span></div>
+        <div class="detail-row"><strong>Date & Time</strong><span>{{ appointment.date }} at {{ appointment.time_slot }}</span></div>
+        {% if appointment.ai_assigned_doctor %}
+        <div class="ai-badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> AI-matched to your symptoms</div>
+        {% endif %}
+      </div>
+
+      <div class="success-actions">
+        <a href="{% url 'book_appointment' %}" class="btn-primary">Book Another</a>
+        <a href="{% url 'home' %}" class="btn-glass">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

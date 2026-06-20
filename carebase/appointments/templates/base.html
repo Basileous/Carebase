@@ -1,0 +1,369 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareBase | Private Medical Clinic</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1A2B4A;
+      --navy-mid: #2A3F6A;
+      --green: #7CB518;
+      --green-light: #A3E635;
+      --green-pale: #F0F7E0;
+      --white: #FFFFFF;
+      --off-white: #F8F9FB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-400: #9CA3AF;
+      --gray-600: #4B5563;
+      --gray-800: #1F2937;
+      --text: #2D3748;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.15);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; line-height: 1.2; }
+
+    /* ═══════════════════════════════════════
+       TOP BAR — exactly like VitaMédicale
+       narrow dark strip, phone left, lang+auth right
+    ═══════════════════════════════════════ */
+    .top-bar {
+      background: var(--navy);
+      color: rgba(255,255,255,0.75);
+      padding: 10px 0;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .top-bar-inner {
+      max-width: 1260px; margin: 0 auto; padding: 0 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .top-bar-left { display: flex; align-items: center; gap: 6px; }
+    .top-bar-left a { color: rgba(255,255,255,0.9); text-decoration: none; font-weight: 500; }
+    .top-bar-left a:hover { color: var(--green-light); }
+    .top-bar-right { display: flex; align-items: center; gap: 20px; }
+    .top-bar-right a { color: var(--green-light); text-decoration: none; font-weight: 600; font-size: 12.5px; transition: opacity .2s; }
+    .top-bar-right a:hover { opacity: 0.8; }
+    .top-bar-right span { color: rgba(255,255,255,0.4); font-size: 12.5px; }
+    .top-bar-right .user-email { color: rgba(255,255,255,0.65); font-size: 12px; }
+
+    /* ═══════════════════════════════════════
+       NAVBAR — VitaMédicale style
+       logo left · links center · CTA button right
+    ═══════════════════════════════════════ */
+    .navbar {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--gray-200);
+      height: 76px;
+      display: flex; align-items: center;
+      box-shadow: 0 2px 12px rgba(26,43,74,0.07);
+      transition: var(--transition);
+    }
+    .nav-inner {
+      max-width: 1260px; margin: 0 auto; padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+      gap: 2rem;
+    }
+
+    /* Logo */
+    .nav-logo {
+      text-decoration: none; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      width: 42px; height: 42px; background: var(--navy); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-mark svg { width: 24px; height: 24px; fill: var(--green-light); }
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700; color: var(--navy);
+    }
+    .nav-logo-text span { color: var(--green); }
+
+    /* Nav links — centered cluster */
+    .nav-links {
+      display: flex; align-items: center; gap: 2px;
+      list-style: none; flex: 1; justify-content: center;
+    }
+    .nav-links > li { position: relative; }
+    .nav-links > li > a {
+      display: flex; align-items: center; gap: 4px;
+      text-decoration: none; color: var(--gray-800);
+      font-size: 14px; font-weight: 500;
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      transition: var(--transition); white-space: nowrap;
+    }
+    .nav-links > li > a:hover { color: var(--navy); background: var(--gray-100); }
+    .nav-links > li > a.active { color: var(--green); font-weight: 600; }
+    .nav-chevron { font-size: 9px; opacity: 0.5; transition: transform 0.2s; }
+    .nav-links > li:hover .nav-chevron { transform: rotate(180deg); }
+
+    /* Dropdown */
+    .nav-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0;
+      background: white; border: 1px solid var(--gray-200);
+      border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      min-width: 230px; padding: 8px;
+      opacity: 0; visibility: hidden; transform: translateY(-6px);
+      transition: var(--transition); z-index: 200;
+    }
+    .nav-links > li:hover .nav-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-dropdown a {
+      display: block; padding: 10px 14px; border-radius: var(--radius-sm);
+      text-decoration: none; color: var(--gray-800); font-size: 13.5px;
+      transition: var(--transition);
+    }
+    .nav-dropdown a:hover { background: var(--green-pale); color: var(--navy); }
+
+    /* CTA button */
+    .nav-cta {
+      background: var(--green-light); color: white;
+      padding: 11px 22px; border-radius: 50px;
+      font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap;
+      transition: var(--transition); box-shadow: 0 4px 14px rgba(163,230,53,0.35);
+      flex-shrink: 0; letter-spacing: 0.1px;
+    }
+    .nav-cta:hover { background: var(--green); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,181,24,0.4); }
+
+    /* ═══════════════════════════════════════
+       SHARED COMPONENTS
+    ═══════════════════════════════════════ */
+    .container { max-width: 1260px; margin: 0 auto; padding: 0 2rem; }
+
+    .section-tag {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2.5px; color: var(--green);
+      margin-bottom: 12px; display: block;
+    }
+    .section-title {
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+      color: var(--navy); margin-bottom: 20px;
+      font-family: 'Playfair Display', serif;
+    }
+    .section-subtitle {
+      font-size: 15.5px; color: var(--gray-600);
+      max-width: 560px; line-height: 1.75;
+    }
+
+    .btn-green {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green-light); color: white;
+      padding: 13px 28px; border-radius: 50px;
+      font-weight: 700; font-size: 14px; letter-spacing: 0.1px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: var(--transition); box-shadow: 0 4px 14px rgba(163,230,53,0.30);
+    }
+    .btn-green:hover { background: var(--green); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,181,24,0.40); }
+
+    .btn-outline-navy {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--navy);
+      padding: 13px 28px; border-radius: 50px;
+      font-weight: 700; font-size: 14px;
+      text-decoration: none; border: 2px solid var(--navy); cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-outline-navy:hover { background: var(--navy); color: white; }
+
+    /* ═══════════════════════════════════════
+       FOOTER — VitaMédicale style
+       rounded top, dark navy, 4-col grid
+    ═══════════════════════════════════════ */
+    .main-footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.8);
+      padding: 64px 0 0;
+      border-radius: 60px 60px 0 0;
+      margin-top: 64px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.6fr;
+      gap: 40px;
+      padding-bottom: 52px;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; font-weight: 700; color: white; margin-bottom: 14px;
+    }
+    .footer-logo span { color: var(--green-light); }
+    .footer-brand p {
+      font-size: 13.5px; line-height: 1.75; opacity: 0.7; max-width: 260px;
+    }
+    .footer-col h4 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: rgba(255,255,255,0.38); margin-bottom: 18px;
+    }
+    .footer-col a {
+      display: block; color: rgba(255,255,255,0.72); font-size: 13.5px;
+      text-decoration: none; margin-bottom: 11px; transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--green-light); }
+    .footer-contact-item {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 13px;
+    }
+    .footer-contact-item .icon { font-size: 14px; margin-top: 2px; flex-shrink: 0; }
+    .footer-contact-item span { font-size: 13.5px; opacity: 0.75; line-height: 1.55; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding: 22px 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; opacity: 0.45;
+    }
+
+    /* Hamburger (mobile) */
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 8px; border: none; background: none;
+    }
+    .nav-hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--navy); border-radius: 2px; transition: var(--transition);
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 960px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .top-bar-left { display: none; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── TOP BAR ── -->
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div class="top-bar-left">
+        <span>📞</span>
+        <a href="tel:+924185044220">Call Us: +92 41 850 4422</a>
+      </div>
+      <div class="top-bar-right">
+        {% if user.is_authenticated %}
+          <span class="user-email">👤 {{ user.email }}</span>
+          <a href="{% url 'account_logout' %}">Sign Out</a>
+        {% else %}
+          <a href="{% url 'account_login' %}">Sign In</a>
+        {% endif %}
+        <span>|</span>
+        <span>English</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+
+      <a class="nav-logo" href="{% url 'home' %}">
+        <div class="nav-logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+        </div>
+        <span class="nav-logo-text">Care<span>Base</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="{% url 'about' %}">About us</a></li>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li>
+          <a href="{% url 'patients' %}">Patients <span class="nav-chevron">▼</span></a>
+          <div class="nav-dropdown">
+            <a href="{% url 'patients' %}#checkup">❤️ Health Check-up</a>
+            <a href="{% url 'patients' %}#general">🩺 General Medicine</a>
+            <a href="{% url 'patients' %}#ai">🤖 AI Diagnostics</a>
+            <a href="{% url 'patients' %}#specialist">👨‍⚕️ Specialist Services</a>
+            <a href="{% url 'patients' %}#followup">📋 Follow-up Care</a>
+            <a href="{% url 'patients' %}#emergency">🚨 Emergency Services</a>
+          </div>
+        </li>
+        <li><a href="{% url 'rates' %}">Rates</a></li>
+        <li><a href="{% url 'contact' %}">Contact us</a></li>
+      </ul>
+
+      <button class="nav-hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <a href="{% url 'book_appointment' %}" class="nav-cta">Make an appointment!</a>
+    </div>
+  </nav>
+
+  <!-- ── CONTENT ── -->
+  <main>{% block content %}{% endblock %}</main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">Care<span>Base</span></div>
+          <p>Your private medical clinic with no membership fees. Expert care, AI-powered diagnostics, seamless scheduling.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <a href="{% url 'about' %}">About us</a>
+          <a href="{% url 'rates' %}">Rates</a>
+          <a href="{% url 'patients' %}">Services</a>
+          <a href="{% url 'contact' %}">Contact us</a>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <a href="{% url 'patients' %}">General Medicine</a>
+          <a href="{% url 'patients' %}">AI Diagnostics</a>
+          <a href="{% url 'patients' %}">Cardiology</a>
+          <a href="{% url 'patients' %}">Pediatrics</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contact us</h4>
+          <div class="footer-contact-item">
+            <span class="icon">✉️</span>
+            <span>communication@carebase.com</span>
+          </div>
+          <div class="footer-contact-item">
+            <span class="icon">📞</span>
+            <span>+92 41 850 4422</span>
+          </div>
+          <div class="footer-contact-item">
+            <span class="icon">📍</span>
+            <span>Suite 12, Regency Plaza, Mall Road, Faisalabad</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>CareBase © 2026 All rights reserved.</span>
+        <span>Privacy Policy</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

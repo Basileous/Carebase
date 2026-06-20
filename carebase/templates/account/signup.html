@@ -1,0 +1,206 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | CareBase Clinic</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1A365D 0%, #2A4A7F 60%, #1A365D 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 460px;
+      padding: 48px 40px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+    .logo { font-size: 2rem; font-weight: 900; color: #1A365D; margin-bottom: 6px; }
+    .logo span { color: #A3E635; }
+    .tagline { color: #718096; font-size: 0.88rem; margin-bottom: 28px; }
+
+    .secure-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(163,230,53,0.1); border: 1px solid rgba(163,230,53,0.3); border-radius: 20px; padding: 4px 14px; margin-bottom: 24px; }
+    .secure-badge span { color: #4A7C59; font-size: 0.78rem; font-weight: 600; }
+
+    .input-group { margin-bottom: 16px; text-align: left; }
+    .input-group label { display: block; font-size: 0.85rem; color: #4A5568; margin-bottom: 6px; font-weight: 600; }
+    .input-group input {
+      width: 100%; padding: 12px 16px; border: 1px solid #E2E8F0;
+      border-radius: 8px; font-family: inherit; font-size: 0.95rem;
+      outline: none; transition: border-color 0.2s; color: #2D3748;
+    }
+    .input-group input:focus { border-color: #1A365D; box-shadow: 0 0 0 3px rgba(26,54,93,0.08); }
+
+    /* Error state */
+    .input-group input.error { border-color: #E53E3E; }
+    .field-error { color: #E53E3E; font-size: 0.78rem; margin-top: 5px; }
+
+    /* Password strength bar */
+    .strength-wrap { margin-top: 8px; }
+    .strength-bar { height: 4px; border-radius: 4px; background: #E2E8F0; overflow: hidden; margin-bottom: 4px; }
+    .strength-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s, background 0.3s; }
+    .strength-label { font-size: 0.75rem; color: #718096; text-align: right; }
+
+    .submit-btn {
+      width: 100%; padding: 14px; background: #1A365D; color: white;
+      border: none; border-radius: 12px; font-weight: 600; font-size: 1rem;
+      cursor: pointer; transition: background 0.2s; margin-top: 8px;
+    }
+    .submit-btn:hover { background: #2A4A7F; }
+
+    .signin-link { display: block; margin-top: 20px; font-size: 0.85rem; color: #718096; }
+    .signin-link a { color: #1A365D; font-weight: 600; text-decoration: none; }
+    .signin-link a:hover { text-decoration: underline; }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+    .divider hr { flex: 1; border: none; border-top: 1px solid #E2E8F0; }
+    .divider span { color: #A0AEC0; font-size: 0.82rem; }
+
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      width: 100%; padding: 14px 20px; border: 2px solid #E2E8F0;
+      border-radius: 12px; background: white; color: #2D3748;
+      font-size: 0.95rem; font-weight: 600; text-decoration: none;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .google-btn:hover { border-color: #1A365D; background: #F7FAFF; box-shadow: 0 4px 12px rgba(26,54,93,0.12); }
+    .google-icon { width: 22px; height: 22px; }
+
+    .error-alert { background: #FFF5F5; border: 1px solid #FED7D7; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; text-align: left; }
+    .error-alert p { color: #C53030; font-size: 0.84rem; line-height: 1.5; }
+
+    .back-link { display: block; margin-top: 24px; color: #718096; font-size: 0.85rem; text-decoration: none; }
+    .back-link:hover { color: #1A365D; }
+
+    .terms { font-size: 0.78rem; color: #A0AEC0; margin-top: 16px; line-height: 1.5; }
+    .terms a { color: #1A365D; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Care<span>Base</span></div>
+    <p class="tagline">Private Medical Clinic</p>
+
+    <div class="secure-badge">
+      <span>🏥 Create Your Patient Account</span>
+    </div>
+
+    <h2 style="color:#1A365D; font-size:1.4rem; font-weight:800; margin-bottom:8px;">Join CareBase</h2>
+    <p style="color:#718096; font-size:0.9rem; margin-bottom:24px;">
+      Sign up to book appointments and track your health.
+    </p>
+
+    {% if form.errors %}
+    <div class="error-alert">
+      {% for field in form %}
+        {% for error in field.errors %}
+          <p>⚠ {{ error }}</p>
+        {% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <p>⚠ {{ error }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'account_signup' %}" id="signupForm">
+      {% csrf_token %}
+
+      <div class="input-group">
+        <label for="id_email">Email Address</label>
+        <input type="email" name="email" id="id_email"
+               value="{{ form.email.value|default:'' }}"
+               placeholder="you@example.com" required
+               class="{% if form.email.errors %}error{% endif %}">
+        {% for err in form.email.errors %}<p class="field-error">{{ err }}</p>{% endfor %}
+      </div>
+
+      <div class="input-group">
+        <label for="id_password1">Password</label>
+        <input type="password" name="password1" id="id_password1"
+               placeholder="Create a strong password" required
+               class="{% if form.password1.errors %}error{% endif %}"
+               oninput="checkStrength(this.value)">
+        <div class="strength-wrap">
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+        {% for err in form.password1.errors %}<p class="field-error">{{ err }}</p>{% endfor %}
+      </div>
+
+      <div class="input-group">
+        <label for="id_password2">Confirm Password</label>
+        <input type="password" name="password2" id="id_password2"
+               placeholder="Repeat your password" required
+               class="{% if form.password2.errors %}error{% endif %}">
+        {% for err in form.password2.errors %}<p class="field-error">{{ err }}</p>{% endfor %}
+      </div>
+
+      {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% endif %}
+
+      <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+
+    <p class="terms">
+      By signing up you agree to CareBase's
+      <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>.
+    </p>
+
+    <p class="signin-link">Already have an account? <a href="{% url 'account_login' %}">Sign In</a></p>
+
+    <div class="divider"><hr><span>Or sign up with</span><hr></div>
+
+    <a href="{% provider_login_url 'google' %}" class="google-btn">
+      <svg class="google-icon" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Continue with Google
+    </a>
+
+    <a href="/" class="back-link">← Back to CareBase Home</a>
+  </div>
+
+  <script>
+  function checkStrength(pw) {
+    const fill  = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+    let score = 0;
+    if (pw.length >= 8)  score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    const levels = [
+      { pct: '0%',   color: '#E2E8F0', text: '' },
+      { pct: '25%',  color: '#E53E3E', text: 'Weak' },
+      { pct: '50%',  color: '#F6AD55', text: 'Fair' },
+      { pct: '75%',  color: '#68D391', text: 'Good' },
+      { pct: '100%', color: '#38A169', text: 'Strong ✓' },
+    ];
+    const l = levels[score];
+    fill.style.width      = l.pct;
+    fill.style.background = l.color;
+    label.textContent     = l.text;
+    label.style.color     = l.color;
+  }
+  </script>
+</body>
+</html>

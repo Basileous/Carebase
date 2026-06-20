@@ -1,0 +1,470 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+.book-hero { padding: 80px 0 60px; text-align: center; position: relative; border-bottom: 1px solid var(--card-border); }
+.book-hero h1 { font-size: clamp(2.4rem, 5vw, 3.5rem); margin-bottom: 16px; }
+.book-hero p { color: var(--text-dim); font-size: 16px; max-width: 520px; margin: 0 auto; }
+
+.booking-wrap { padding: 60px 0 90px; }
+.booking-inner { max-width: 800px; margin: 0 auto; }
+
+.error-msg { background: #fee2e2; border: 1px solid #f87171; color: #b91c1c; padding: 16px 20px; border-radius: 12px; margin-bottom: 24px; font-weight: 500; }
+
+.form-section { background: white; border: 1px solid var(--card-border); border-radius: 20px; overflow: hidden; margin-bottom: 24px; transition: var(--transition); box-shadow: var(--shadow-sm); animation: fadeUp 0.6s ease-out both; }
+.form-section:nth-child(2) { animation-delay: 0.1s; }
+.form-section:nth-child(3) { animation-delay: 0.2s; }
+.form-section:hover { box-shadow: var(--shadow-md); border-color: var(--primary-pale); }
+
+.section-header { background: #f8fafc; border-bottom: 1px solid var(--card-border); padding: 20px 28px; display: flex; align-items: center; gap: 16px; }
+.section-icon { width: 44px; height: 44px; background: var(--primary-pale); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.section-icon svg { width: 22px; height: 22px; fill: var(--primary-dark); }
+.section-header h3 { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--heading-blue); margin: 0; }
+.section-header p { color: var(--text-dim); font-size: 13.5px; margin: 0; }
+.section-body { padding: 32px 28px; }
+
+.field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.field-full { grid-column: 1 / -1; }
+
+.form-field { display: flex; flex-direction: column; gap: 8px; }
+.form-field label { font-size: 13px; font-weight: 700; color: var(--heading-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-field label .req { color: #ef4444; }
+.form-field input, .form-field select, .form-field textarea {
+  width: 100%; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+  font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text-main); transition: var(--transition);
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+  outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px var(--primary-pale);
+}
+.form-field input:hover, .form-field select:hover, .form-field textarea:hover { border-color: #94a3b8; }
+.form-field textarea { resize: vertical; min-height: 120px; }
+.field-hint { font-size: 13px; color: var(--text-dim); margin-top: 6px; padding: 12px 16px; background: var(--primary-pale); border-left: 3px solid var(--primary); border-radius: 0 8px 8px 0; }
+
+/* ── AI Recommend Button ── */
+.ai-rec-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 24px; border-radius: 12px; font-weight: 700; font-size: 14.5px;
+  border: 2px solid var(--primary); color: var(--primary-dark); background: var(--primary-pale);
+  cursor: pointer; transition: all 0.3s ease; font-family: 'DM Sans', sans-serif;
+  margin-top: 10px;
+}
+.ai-rec-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 6px 20px var(--primary-glow); }
+.ai-rec-btn:active { transform: scale(0.98); }
+.ai-rec-btn svg { width: 18px; height: 18px; fill: currentColor; transition: transform 0.3s ease; }
+.ai-rec-btn:hover svg { transform: rotate(15deg) scale(1.1); }
+.ai-rec-btn .spinner { display: none; width: 16px; height: 16px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ai-rec-btn.loading .spinner { display: inline-block; }
+.ai-rec-btn.loading .btn-label { display: none; }
+.ai-rec-btn.loading svg:not(.spinner) { display: none; }
+
+/* ── AI Result Card ── */
+#aiResultCard {
+  display: none; margin-top: 20px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 2px solid rgba(16,185,129,0.3); border-radius: 16px;
+  padding: 24px 26px; animation: slideDown 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+#aiResultCard.visible { display: block; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+.ai-result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.ai-badge-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--primary); color: white; padding: 5px 14px;
+  border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+.ai-badge-pill svg { width: 13px; height: 13px; fill: white; }
+.ai-result-title { font-size: 16px; font-weight: 700; color: var(--heading-blue); }
+
+.ai-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.ai-info-box { background: white; border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 14px 16px; }
+.ai-info-box .aib-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 6px; }
+.ai-info-box .aib-value { font-size: 14px; font-weight: 600; color: var(--heading-blue); line-height: 1.5; }
+.ai-info-box.full { grid-column: 1/-1; }
+
+/* ── Doctor Card (recommended) ── */
+.rec-doctor-card {
+  display: flex; align-items: center; gap: 16px;
+  background: white; border: 2px solid var(--primary); border-radius: 14px; padding: 16px 20px;
+  margin-bottom: 18px; transition: all 0.3s ease;
+}
+.rec-doctor-card:hover { box-shadow: 0 8px 24px var(--primary-glow); transform: translateY(-2px); }
+.rec-doc-avatar {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary), #06b6d4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: white; font-weight: 700;
+}
+.rec-doc-info { flex: 1; }
+.rec-doc-name { font-size: 16px; font-weight: 700; color: var(--heading-blue); }
+.rec-doc-spec { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+.rec-check { color: var(--primary); }
+.rec-check svg { width: 22px; height: 22px; fill: var(--primary); }
+
+.use-rec-btn {
+  width: 100%; padding: 13px; border-radius: 11px; font-weight: 700; font-size: 14.5px;
+  background: var(--primary); color: white; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.use-rec-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 18px var(--primary-glow); }
+
+/* ── Doctor select mode toggle ── */
+.doctor-mode-wrap { margin-bottom: 20px; }
+.doctor-mode-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.mode-tab {
+  flex: 1; padding: 11px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+  border: 1.5px solid #e2e8f0; background: #f8fafc; color: var(--text-dim);
+  cursor: pointer; transition: all 0.25s ease; font-family: 'DM Sans', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.mode-tab.active { border-color: var(--primary); background: var(--primary-pale); color: var(--primary-dark); }
+.mode-tab:hover:not(.active) { border-color: #94a3b8; background: white; }
+
+/* ── Slot loading ── */
+#slotLoading { display: none; font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+#slotLoading.visible { display: flex; align-items: center; gap: 8px; }
+.slot-spinner { width: 14px; height: 14px; border: 2px solid var(--primary-pale); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
+#noSlotsMsg { display: none; font-size: 13px; color: #ef4444; margin-top: 6px; padding: 10px 14px; background: #fee2e2; border-radius: 8px; }
+#noSlotsMsg.visible { display: block; }
+
+.submit-wrap { text-align: center; margin-top: 24px; }
+.submit-btn { width: 100%; max-width: 400px; padding: 18px; font-size: 16px; justify-content: center; }
+
+@media(max-width:700px) { .field-grid-2 { grid-template-columns: 1fr; } .section-body { padding: 24px 20px; } .ai-result-grid { grid-template-columns: 1fr; } .doctor-mode-tabs { flex-direction: column; } }
+</style>
+
+<section class="book-hero">
+  <div class="container">
+    <span class="section-tag reveal">Online Booking</span>
+    <h1 class="reveal-text" data-split-speed="fast">Book Your Appointment</h1>
+    <p class="reveal-text soft-fade" data-split-speed="fast">Logged in as <strong>{{ user.email }}</strong>. Fill in the form below to secure your spot.</p>
+  </div>
+</section>
+
+<section class="booking-wrap">
+  <div class="container">
+    <div class="booking-inner">
+      {% if messages %}{% for msg in messages %}<div class="error-msg">{{ msg }}</div>{% endfor %}{% endif %}
+
+      <form method="POST" action="{% url 'book_appointment' %}" id="bookingForm">
+        {% csrf_token %}
+
+        <!-- Personal Details -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+            <div><h3>Personal Details</h3><p>Your information is kept secure</p></div>
+          </div>
+          <div class="section-body">
+            <div class="field-grid-2">
+              <div class="form-field"><label>Full Name <span class="req">*</span></label><input type="text" name="name" value="{{ patient.name|default:form_data.name }}" required></div>
+              <div class="form-field"><label>Age <span class="req">*</span></label><input type="number" name="age" min="1" max="120" value="{{ patient.age|default:form_data.age }}" required></div>
+              <div class="form-field field-full"><label>Address <span class="req">*</span></label><input type="text" name="address" value="{{ patient.address|default:form_data.address }}" required></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Symptoms & AI -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+            <div><h3>Symptoms & AI Analysis</h3><p>Describe your symptoms for AI-powered matching</p></div>
+          </div>
+          <div class="section-body">
+            <div class="form-field">
+              <label>Describe your symptoms <span class="req">*</span></label>
+              <textarea name="symptoms" id="symptomsInput" required>{{ form_data.symptoms }}</textarea>
+              <div class="field-hint">Be as specific as possible — location, duration, severity. Our AI will recommend the right specialist.</div>
+            </div>
+
+            <button type="button" class="ai-rec-btn" id="aiRecBtn">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              <svg class="spinner" viewBox="0 0 24 24"></svg>
+              <span class="btn-label">🤖 Recommend Doctor with AI</span>
+            </button>
+
+            <!-- AI Result Card -->
+            <div id="aiResultCard">
+              <div class="ai-result-header">
+                <div class="ai-badge-pill">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                  AI Analysis
+                </div>
+                <span class="ai-result-title">Here's what our AI found</span>
+              </div>
+
+              <div class="rec-doctor-card" id="recDoctorCard">
+                <div class="rec-doc-avatar" id="recDocAvatar">?</div>
+                <div class="rec-doc-info">
+                  <div class="rec-doc-name" id="recDocName">Loading…</div>
+                  <div class="rec-doc-spec" id="recDocSpec"></div>
+                </div>
+                <div class="rec-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+              </div>
+
+              <div class="ai-result-grid">
+                <div class="ai-info-box">
+                  <div class="aib-label">Recommended Specialty</div>
+                  <div class="aib-value" id="aiSpecialty">—</div>
+                </div>
+                <div class="ai-info-box">
+                  <div class="aib-label">Possible Diagnosis</div>
+                  <div class="aib-value" id="aiDiagnosis">—</div>
+                </div>
+                <div class="ai-info-box full">
+                  <div class="aib-label">Precautions</div>
+                  <div class="aib-value" id="aiPrecautions">—</div>
+                </div>
+              </div>
+
+              <button type="button" class="use-rec-btn" id="useRecBtn">
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Use This Doctor & Load Time Slots
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor & Schedule -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
+            <div><h3>Doctor & Schedule</h3><p>Select your doctor and available time slot</p></div>
+          </div>
+          <div class="section-body">
+
+            <div class="doctor-mode-wrap">
+              <div class="doctor-mode-tabs">
+                <button type="button" class="mode-tab active" id="tabManual" onclick="switchMode('manual')">
+                  <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                  Choose Doctor Manually
+                </button>
+                <button type="button" class="mode-tab" id="tabAI" onclick="switchMode('ai')">
+                  <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                  Use AI Recommendation
+                </button>
+              </div>
+
+              <!-- Manual select -->
+              <div id="manualDoctorWrap">
+                <div class="form-field">
+                  <label>Select Doctor</label>
+                  <select name="doctor" id="doctorSelect">
+                    <option value="">— Any available doctor —</option>
+                    {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}" {% if form_data.doctor == doctor.id|stringformat:"s" %}selected{% endif %}>
+                      Dr. {{ doctor.name }} — {{ doctor.specialty }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <!-- AI selected (hidden input) -->
+              <div id="aiDoctorWrap" style="display:none;">
+                <div class="rec-doctor-card" id="aiSelectedCard" style="border-color: var(--primary);">
+                  <div class="rec-doc-avatar" id="aiSelAvatar" style="font-size:18px;">🤖</div>
+                  <div class="rec-doc-info">
+                    <div class="rec-doc-name" id="aiSelName">AI will recommend after analysis</div>
+                    <div class="rec-doc-spec" id="aiSelSpec">Run AI analysis in the symptoms section above</div>
+                  </div>
+                </div>
+                <input type="hidden" name="doctor" id="aiDoctorInput" value="">
+              </div>
+            </div>
+
+            <div class="field-grid-2">
+              <div class="form-field">
+                <label>Date <span class="req">*</span></label>
+                <input type="date" name="date" id="dateInput" value="{{ form_data.date }}" required min="{% now 'Y-m-d' %}">
+              </div>
+              <div class="form-field">
+                <label>Time Slot <span class="req">*</span></label>
+                <select name="time_slot" id="timeSelect" required>
+                  <option value="">Select a doctor first</option>
+                </select>
+                <span id="slotLoading"><span class="slot-spinner"></span> Loading available slots…</span>
+                <span id="noSlotsMsg">⚠ No slots available for this doctor. Please contact the clinic.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-wrap">
+          <button type="submit" id="submitBtn" class="btn-primary submit-btn">
+            <span id="btnText">Confirm Appointment</span>
+            <span id="btnSpinner" style="display:none;">Booking…</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+// ── Mode: manual vs AI ────────────────────────────────────────────
+let currentMode = 'manual';
+let aiRecommendedDoctorId = null;
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('tabManual').classList.toggle('active', mode === 'manual');
+  document.getElementById('tabAI').classList.toggle('active', mode === 'ai');
+  document.getElementById('manualDoctorWrap').style.display = mode === 'manual' ? 'block' : 'none';
+  document.getElementById('aiDoctorWrap').style.display    = mode === 'ai'     ? 'block' : 'none';
+  // Disable/enable the manual select so it doesn't submit the wrong doctor
+  document.getElementById('doctorSelect').disabled = (mode === 'ai');
+  document.getElementById('aiDoctorInput').disabled = (mode === 'manual');
+
+  if (mode === 'ai' && aiRecommendedDoctorId) {
+    fetchSlots(aiRecommendedDoctorId);
+  } else if (mode === 'manual') {
+    const v = document.getElementById('doctorSelect').value;
+    if (v) fetchSlots(v); else resetSlots();
+  }
+}
+
+// ── Slot fetching ─────────────────────────────────────────────────
+function resetSlots() {
+  document.getElementById('timeSelect').innerHTML = '<option value="">Select a doctor first</option>';
+  document.getElementById('slotLoading').classList.remove('visible');
+  document.getElementById('noSlotsMsg').classList.remove('visible');
+}
+
+function fetchSlots(doctorId) {
+  const timeSelect  = document.getElementById('timeSelect');
+  const slotLoading = document.getElementById('slotLoading');
+  const noSlotsMsg  = document.getElementById('noSlotsMsg');
+
+  timeSelect.innerHTML = '<option value="">Loading…</option>';
+  slotLoading.classList.add('visible');
+  noSlotsMsg.classList.remove('visible');
+
+  if (!doctorId) { resetSlots(); return; }
+
+  fetch('/ajax/doctor-slots/?doctor_id=' + doctorId)
+    .then(r => r.json())
+    .then(data => {
+      slotLoading.classList.remove('visible');
+      timeSelect.innerHTML = '';
+      if (!data.slots || data.slots.length === 0) {
+        timeSelect.innerHTML = '<option value="">No slots available</option>';
+        noSlotsMsg.classList.add('visible');
+        return;
+      }
+      const placeholder = document.createElement('option');
+      placeholder.value = ''; placeholder.textContent = '— Select time slot —';
+      timeSelect.appendChild(placeholder);
+      data.slots.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.time;
+        opt.textContent = s.label;
+        timeSelect.appendChild(opt);
+      });
+    })
+    .catch(() => {
+      slotLoading.classList.remove('visible');
+      timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+    });
+}
+
+document.getElementById('doctorSelect').addEventListener('change', function() {
+  if (currentMode === 'manual') fetchSlots(this.value);
+});
+
+if (document.getElementById('doctorSelect').value) {
+  fetchSlots(document.getElementById('doctorSelect').value);
+}
+
+// ── AI Recommendation ─────────────────────────────────────────────
+document.getElementById('aiRecBtn').addEventListener('click', function() {
+  const symptoms = document.getElementById('symptomsInput').value.trim();
+  if (!symptoms) {
+    document.getElementById('symptomsInput').focus();
+    document.getElementById('symptomsInput').style.borderColor = '#ef4444';
+    setTimeout(() => document.getElementById('symptomsInput').style.borderColor = '', 2000);
+    return;
+  }
+
+  this.classList.add('loading');
+  this.disabled = true;
+
+  fetch('/ajax/ai-recommend/?symptoms=' + encodeURIComponent(symptoms))
+    .then(r => r.json())
+    .then(data => {
+      this.classList.remove('loading');
+      this.disabled = false;
+
+      // Fill result card
+      document.getElementById('aiSpecialty').textContent   = data.specialty   || '—';
+      document.getElementById('aiDiagnosis').textContent   = data.diagnosis   || '—';
+      document.getElementById('aiPrecautions').textContent = data.precautions || '—';
+
+      if (data.doctor) {
+        aiRecommendedDoctorId = data.doctor.id;
+        const initials = (data.doctor.name || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        document.getElementById('recDocAvatar').textContent = initials;
+        document.getElementById('recDocName').textContent   = 'Dr. ' + data.doctor.name;
+        document.getElementById('recDocSpec').textContent   = data.doctor.specialty;
+
+        // Also update the AI tab card
+        document.getElementById('aiSelAvatar').textContent = initials;
+        document.getElementById('aiSelName').textContent   = 'Dr. ' + data.doctor.name;
+        document.getElementById('aiSelSpec').textContent   = data.doctor.specialty + ' · Recommended by AI';
+        document.getElementById('aiDoctorInput').value     = data.doctor.id;
+
+        // Pre-fill slots from response
+        const timeSelect = document.getElementById('timeSelect');
+        timeSelect.innerHTML = '';
+        if (data.slots && data.slots.length > 0) {
+          const ph = document.createElement('option');
+          ph.value = ''; ph.textContent = '— Select time slot —';
+          timeSelect.appendChild(ph);
+          data.slots.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.time; opt.textContent = s.label;
+            timeSelect.appendChild(opt);
+          });
+          document.getElementById('noSlotsMsg').classList.remove('visible');
+        } else {
+          timeSelect.innerHTML = '<option value="">No slots available for this doctor</option>';
+          document.getElementById('noSlotsMsg').classList.add('visible');
+        }
+      }
+
+      document.getElementById('aiResultCard').classList.add('visible');
+    })
+    .catch(() => {
+      this.classList.remove('loading');
+      this.disabled = false;
+      alert('AI analysis failed. Please try again.');
+    });
+});
+
+// Use Recommended Doctor button
+document.getElementById('useRecBtn').addEventListener('click', function() {
+  if (!aiRecommendedDoctorId) return;
+  switchMode('ai');
+  // Scroll to doctor section smoothly
+  document.querySelector('.doctor-mode-tabs').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Highlight
+  const card = document.getElementById('aiSelectedCard');
+  card.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.3)';
+  setTimeout(() => card.style.boxShadow = '', 1500);
+});
+
+// ── Form submit ───────────────────────────────────────────────────
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+  // Validate time slot
+  const ts = document.getElementById('timeSelect').value;
+  if (!ts) { e.preventDefault(); document.getElementById('timeSelect').style.borderColor = '#ef4444'; return; }
+  document.getElementById('btnText').style.display    = 'none';
+  document.getElementById('btnSpinner').style.display = 'inline';
+  document.getElementById('submitBtn').disabled       = true;
+});
+
+// Enforce min date
+document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

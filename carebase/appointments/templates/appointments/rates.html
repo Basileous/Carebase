@@ -1,0 +1,112 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+.rates-hero { padding: 90px 0 60px; text-align: center; border-bottom: 1px solid var(--card-border); }
+.rates-hero h1 { font-size: clamp(2.8rem, 5vw, 4rem); margin-bottom: 16px; }
+
+.pricing-section { padding: 90px 0; }
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1060px; margin: 40px auto 0; }
+
+.pricing-card {
+  background: white; border: 1px solid var(--card-border); border-radius: 24px; padding: 44px 36px;
+  text-align: center; transition: var(--transition); position: relative; box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.pricing-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--primary-pale); }
+
+.pricing-card.featured { border: 2px solid var(--primary); box-shadow: 0 10px 30px var(--primary-glow); transform: scale(1.02); }
+.pricing-card.featured:hover { transform: scale(1.04) translateY(-5px); }
+
+.pricing-badge {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  background: var(--primary); color: white; padding: 6px 24px; border-radius: 0 0 12px 12px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+}
+
+.pricing-icon {
+  width: 64px; height: 64px; background: var(--primary-pale); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; transition: var(--transition);
+}
+.pricing-card:hover .pricing-icon { transform: scale(1.1); background: var(--primary); }
+.pricing-icon svg { width: 30px; height: 30px; fill: var(--primary-dark); transition: var(--transition); }
+.pricing-card:hover .pricing-icon svg { fill: white; }
+
+.pricing-name { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--heading-blue); margin-bottom: 8px; }
+.pricing-amount { font-family: 'Cormorant Garamond', serif; font-size: 3.2rem; font-weight: 700; color: var(--heading-blue); margin: 16px 0 4px; }
+.pricing-period { font-size: 14px; color: var(--text-dim); margin-bottom: 30px; }
+.pricing-features { list-style: none; padding: 0; text-align: left; margin-bottom: 36px; }
+.pricing-features li { font-size: 14.5px; color: var(--text-main); padding: 12px 0; border-bottom: 1px solid #e2e8f0; display: flex; gap: 12px; align-items: center; }
+.pricing-features li:last-child { border-bottom: none; }
+.pricing-features li::before { content: '✓'; color: var(--primary); font-weight: 700; font-size: 18px; }
+
+.pricing-btn { display: block; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 15px; text-decoration: none; transition: var(--transition); background: #f8fafc; color: var(--heading-blue); border: 1px solid #cbd5e1; }
+.pricing-btn:hover { background: var(--primary-pale); color: var(--primary-dark); border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(16,185,129,0.15); }
+.pricing-card.featured .pricing-btn { background: linear-gradient(135deg, var(--primary) 0%, #06b6d4 50%, var(--primary-dark) 100%); background-size:200% 200%; animation:btnGradShift 5s ease infinite; color: white; border: none; box-shadow: 0 4px 15px var(--primary-glow); }
+.pricing-card.featured .pricing-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
+
+.comparison-table { width: 100%; border-collapse: collapse; margin-top: 40px; background: white; border: 1px solid var(--card-border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.comparison-table th { background: #f8fafc; color: var(--heading-blue); padding: 20px; text-align: left; font-size: 15px; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+.comparison-table td { padding: 16px 20px; font-size: 14.5px; border-bottom: 1px solid #e2e8f0; }
+.check { color: var(--primary); font-weight: 700; font-size: 16px; }
+
+
+.comparison-table tr { transition: background 0.2s ease; }
+.comparison-table tbody tr:hover { background: #f0fdf4; }
+.comparison-table tbody tr:hover td:first-child { color: var(--primary-dark); font-weight: 600; }
+@media(max-width:900px){ .pricing-grid{ grid-template-columns: 1fr; max-width: 420px; } .pricing-card.featured{ transform: none; } .pricing-card.featured:hover{ transform: translateY(-5px); } }
+</style>
+
+<section class="rates-hero">
+  <div class="container">
+    <span class="section-tag reveal">Pricing</span>
+    <h1 class="reveal-text" data-split-speed="fast">Our Rates</h1>
+    <p class="section-subtitle reveal-text soft-fade" data-split-speed="fast" style="margin:0 auto;">Transparent, affordable pricing — no hidden fees.</p>
+  </div>
+</section>
+
+<section class="pricing-section">
+  <div class="container">
+    <div class="pricing-grid">
+      <div class="pricing-card reveal reveal-delay-1">
+        <div class="pricing-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+        <div class="pricing-name">General</div>
+        <div class="pricing-amount">Rs. 500</div>
+        <div class="pricing-period">Per visit</div>
+        <ul class="pricing-features"><li>30-minute consultation</li><li>Basic health assessment</li><li>Prescription</li></ul>
+        <a href="{% url 'book_appointment' %}" class="pricing-btn">Book Now</a>
+      </div>
+      <div class="pricing-card featured reveal reveal-delay-2">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        <div class="pricing-name">Specialist</div>
+        <div class="pricing-amount">Rs. 1,200</div>
+        <div class="pricing-period">Per visit</div>
+        <ul class="pricing-features"><li>45-minute consultation</li><li>AI symptom analysis</li><li>Detailed diagnosis report</li></ul>
+        <a href="{% url 'book_appointment' %}" class="pricing-btn">Book Now</a>
+      </div>
+      <div class="pricing-card reveal reveal-delay-3">
+        <div class="pricing-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+        <div class="pricing-name">AI Package</div>
+        <div class="pricing-amount">Rs. 2,000</div>
+        <div class="pricing-period">Per month</div>
+        <ul class="pricing-features"><li>Unlimited AI analysis</li><li>3 specialist visits/month</li><li>Priority support</li></ul>
+        <a href="{% url 'book_appointment' %}" class="pricing-btn">Get Started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section" style="padding-top:0;">
+  <div class="container">
+    <h2 class="section-title reveal-text" data-split-speed="slow" style="text-align:center;">Compare Plans</h2>
+    <table class="comparison-table reveal">
+      <thead><tr><th>Feature</th><th>General</th><th>Specialist</th><th>AI Package</th></tr></thead>
+      <tbody>
+        <tr><td>Doctor Consultation</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>AI Symptom Analysis</td><td>—</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Priority Scheduling</td><td>—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
