@@ -10,22 +10,56 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_local_env():
+    env_file = BASE_DIR / '.env'
+    if not env_file.exists():
+        return
+
+    for line in env_file.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_local_env()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@2nl*bn5hv(_t7ptdmk1w30yeft!f5m1j&364$rfiha#80(on('
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-@2nl*bn5hv(_t7ptdmk1w30yeft!f5m1j&364$rfiha#80(on(',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if 'DJANGO_DEBUG' in os.environ:
+    DEBUG = os.getenv('DJANGO_DEBUG', '').lower() in {'1', 'true', 'yes', 'on'}
+else:
+    DEBUG = not bool(os.getenv('VERCEL'))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,.vercel.app').split(',')
+    if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://*.vercel.app').split(',')
+    if origin.strip()
+]
 
 
 # Application definition
@@ -40,25 +74,10 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google', # For Google
     'appointments'
 ]
 
 SITE_ID = 1
-
-# Configure Google to use 'email' as the primary login identifier
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-        'APP': {
-            'client_id': 'dummy',      # placeholder
-            'secret': 'dummy',         # placeholder
-            'key': ''
-        }
-    }
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -96,16 +115,38 @@ WSGI_APPLICATION = 'carebase.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'carebasedatabase',
-        'USER': 'postgres',      # Your pgAdmin username
-        'PASSWORD': 'hamdoon06', # Your pgAdmin password
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+database_url = os.getenv('DATABASE_URL') or os.getenv('POSTGRES_URL')
+
+if database_url:
+    parsed_db = urlparse(database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed_db.path.lstrip('/'),
+            'USER': parsed_db.username or '',
+            'PASSWORD': parsed_db.password or '',
+            'HOST': parsed_db.hostname or '',
+            'PORT': str(parsed_db.port or 5432),
+        }
     }
-}
+elif os.getenv('DB_ENGINE', 'postgres') == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'carebasedatabase'),
+            'USER': os.getenv('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'cutu'),
+            'HOST': os.getenv('POSTGRES_HOST', '127.0.0.1'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -163,13 +204,12 @@ LOGOUT_REDIRECT_URL = 'account_login'
 # Ensure the Site ID matches what you have in the Admin
 SITE_ID = 1
 
-# 3. Optional: Make email required for Google Login
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_EMAIL_REQUIRED = False
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Add this line to tell Django to look in your root 'static' folder
 STATICFILES_DIRS = [
@@ -182,3 +222,7 @@ EMAIL_USE_TLS       = True
 EMAIL_HOST_USER     = 'your@gmail.com'
 EMAIL_HOST_PASSWORD = 'your_app_password'  # Gmail App Password
 DEFAULT_FROM_EMAIL  = 'CareBase <your@gmail.com>'
+
+XAI_API_KEY = os.getenv('XAI_API_KEY') or os.getenv('GROK_API_KEY') or os.getenv('GROQ_API_KEY', '')
+XAI_MODEL = os.getenv('XAI_MODEL') or os.getenv('GROK_MODEL') or 'grok-4.3'
+XAI_RESPONSES_URL = os.getenv('XAI_RESPONSES_URL', 'https://api.x.ai/v1/responses')

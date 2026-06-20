@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "python manage.py collectstatic --noinput",
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": "{.git/**,.venv/**,venv/**,env/**,__pycache__/**,**/__pycache__/**,**/*.pyc,db.sqlite3,*.sqlite3,runserver*.log,carebasedatabase.sql,test.py,train_chatbot.py}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/static/(.*)",
+      "destination": "/staticfiles/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
+}

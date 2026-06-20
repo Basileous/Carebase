@@ -36,15 +36,6 @@
   .specialist-book { display: inline-block; padding: 10px 20px; border-radius: 50px; background: var(--primary-pale); color: var(--primary-dark); font-weight: 700; font-size: 13px; text-decoration: none; transition: var(--transition); }
   .specialist-book:hover { background: var(--primary); color: white; transform: scale(1.05); }
 
-  /* Dev Grid */
-  .dev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 80px; }
-  .dev-card { background: white; border: 1px solid var(--card-border); border-radius: 20px; padding: 30px; text-align: center; box-shadow: var(--shadow-sm); transition: var(--transition); }
-  .dev-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-  .dev-avatar { width: 70px; height: 70px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-  .dev-name { font-size: 18px; font-weight: 700; color: var(--heading-blue); }
-  .dev-role { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
-  .dev-reg { font-size: 12px; background: #f1f5f9; display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 600; color: var(--heading-blue); }
-
   .stack-tags { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 30px; }
   .stack-tag { background: white; border: 1px solid var(--card-border); padding: 12px 24px; border-radius: 50px; font-weight: 600; color: var(--heading-blue); box-shadow: var(--shadow-sm); transition: var(--transition); }
   .stack-tag:hover { transform: translateY(-3px); border-color: var(--primary); color: var(--primary-dark); }
@@ -107,7 +98,7 @@
           <li>No membership fees required</li>
           <li>Flexible appointment scheduling</li>
           <li>Affordable, transparent pricing</li>
-          <li>Google login — no new passwords</li>
+          <li>Secure email login for patient accounts</li>
         </ul>
       </div>
     </div>
@@ -127,20 +118,6 @@
       <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc3.webp' %}" alt="Dr. Sara Malik"></div><div class="specialist-info"><h3>Dr. Sara Malik</h3><div class="specialist-specialty">Pediatrics</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
       <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc5.webp' %}" alt="Dr. Bilal Raza"></div><div class="specialist-info"><h3>Dr. Bilal Raza</h3><div class="specialist-specialty">Neurology</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
       <div class="specialist-card reveal"><div class="specialist-photo"><img src="{% static 'img/doc1.webp' %}" alt="Dr. Omar Farooq"></div><div class="specialist-info"><h3>Dr. Omar Farooq</h3><div class="specialist-specialty">Dermatology</div><a href="{% url 'book_appointment' %}" class="specialist-book">Book Now</a></div></div>
-    </div>
-
-    <hr style="border: none; border-top: 1px solid var(--card-border); margin: 80px 0;">
-
-    <div style="text-align: center; margin-bottom: 50px;">
-      <h2 class="section-title reveal-text">Meet the Developers</h2>
-      <p style="color:var(--text-dim); font-size:15px;">IKES&T Semester Project — Software Engineering</p>
-    </div>
-    
-    <div class="dev-grid">
-      <div class="dev-card reveal"><div class="dev-avatar" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);">MH</div><div class="dev-name">Muhammad Hamdoon</div><div class="dev-role">Software Engineer</div><div class="dev-reg">Reg# 2024387</div></div>
-      <div class="dev-card reveal reveal-delay-1"><div class="dev-avatar" style="background: linear-gradient(135deg, #059669, #10b981);">AI</div><div class="dev-name">Abeer Ihsan</div><div class="dev-role">Software Engineer</div><div class="dev-reg">Reg# 2024053</div></div>
-      <div class="dev-card reveal reveal-delay-2"><div class="dev-avatar" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">BJ</div><div class="dev-name">Basil Joseph</div><div class="dev-role">Software Engineer</div><div class="dev-reg">Reg# 2024138</div></div>
-    </div>
-  </div>
+    </div></div>
 </section>
 {% endblock %}
